@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f6f3">
+<title>测测你的旅游人设 · V2.1</title>
+<link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+<main class="shell">
+  <div class="topbar">
+    <div class="brand" id="brandText">旅游人设测试</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="lang-switch" aria-label="Language"><button class="lang-btn" data-lang="zh-CN">简中</button><button class="lang-btn" data-lang="zh-Hant">繁中</button><button class="lang-btn" data-lang="en">EN</button></div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+  </div>
+  <div class="progress-track" id="progressTrack" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+
+  <section id="intro" class="screen active">
+    <div class="hero">
+      <div class="eyebrow" id="homeEyebrow">22 个旅行小情境</div>
+      <h1 id="homeTitle">测测你的旅游人设</h1>
+      <p class="lead" id="homeSubtitle">看看你出去玩最在意什么。</p>
+      <div class="mini-note" id="homeNote"></div>
+      <button class="primary" id="startBtn">开始测试</button>
+    </div>
+  </section>
+
+  <section id="quiz" class="screen">
+    <div class="question-wrap">
+      <div class="q-kicker" id="qKicker"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="multi-actions" id="multiActions" style="display:none">
+        <button class="primary" id="multiSubmit" disabled>选好了</button>
+      </div>
+      <div class="micro" id="microcopy"></div>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div id="resultContent"></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>
