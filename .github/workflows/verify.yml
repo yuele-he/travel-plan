@@ -13,15 +13,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Reconstruct bundled sources
+      - name: Reconstruct bundled sources like the browser
         shell: bash
         run: |
           set -euo pipefail
-          cat src/_parts/app.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d > /tmp/app.mjs
-          cat src/_parts/data.{1,2,3,4,5,6}.b64 | tr -d '\n\r ' | base64 -d > /tmp/data.mjs
-          base64 -d src/_parts/locale-zh-CN.gz.b64 | gzip -dc > /tmp/zh-CN.mjs
-          cat src/_parts/locale-en.gz.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d | gzip -dc > /tmp/en.mjs
-          cat src/_parts/locale-zh-Hant7.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d | gzip -dc > /tmp/zh-Hant.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import zlib from 'node:zlib';
+
+          const read = p => fs.readFileSync(p, 'utf8').trim();
+          const joined = paths => paths.map(read).join('');
+          const decode = s => Buffer.from(atob(s), 'latin1');
+          const writeB64 = (out, paths) => fs.writeFileSync(out, decode(joined(paths)));
+          const writeGzipB64 = (out, paths) => fs.writeFileSync(out, zlib.gunzipSync(decode(joined(paths))));
+
+          writeB64('/tmp/app.mjs', ['src/_parts/app.1.b64','src/_parts/app.2.b64','src/_parts/app.3.b64']);
+          writeB64('/tmp/data.mjs', ['src/_parts/data.1.b64','src/_parts/data.2.b64','src/_parts/data.3.b64','src/_parts/data.4.b64','src/_parts/data.5.b64','src/_parts/data.6.b64']);
+          writeGzipB64('/tmp/zh-CN.mjs', ['src/_parts/locale-zh-CN.gz.b64']);
+          writeGzipB64('/tmp/en.mjs', ['src/_parts/locale-en.gz.1.b64','src/_parts/locale-en.gz.2.b64','src/_parts/locale-en.gz.3.b64']);
+          writeGzipB64('/tmp/zh-Hant.mjs', ['src/_parts/locale-zh-Hant7.1.b64','src/_parts/locale-zh-Hant7.2.b64','src/_parts/locale-zh-Hant7.3.b64']);
+          console.log('Bundled sources reconstructed successfully');
+          NODE
       - name: Syntax check
         shell: bash
         run: |
