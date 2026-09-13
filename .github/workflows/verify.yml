@@ -28,7 +28,7 @@ jobs:
           const writeGzipB64 = (out, paths) => fs.writeFileSync(out, zlib.gunzipSync(decode(joined(paths))));
 
           writeB64('/tmp/app.mjs', ['src/_parts/app.1.b64','src/_parts/app.2.b64','src/_parts/app.3.b64']);
-          writeB64('/tmp/data.mjs', ['src/_parts/data.1.b64','src/_parts/data.2.b64','src/_parts/data.3.b64','src/_parts/data.4.b64','src/_parts/data.5.b64','src/_parts/data.6.b64']);
+          writeGzipB64('/tmp/data.mjs', ['src/_parts/data.gz.1.b64','src/_parts/data.gz.2.b64','src/_parts/data.gz.3.b64']);
           writeGzipB64('/tmp/zh-CN.mjs', ['src/_parts/locale-zh-CN.gz.b64']);
           writeGzipB64('/tmp/en.mjs', ['src/_parts/locale-en.gz.1.b64','src/_parts/locale-en.gz.2.b64','src/_parts/locale-en.gz.3.b64']);
           writeGzipB64('/tmp/zh-Hant.mjs', ['src/_parts/locale-zh-Hant7.1.b64','src/_parts/locale-zh-Hant7.2.b64','src/_parts/locale-zh-Hant7.3.b64']);
