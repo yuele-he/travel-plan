@@ -1,3 +1,3 @@
-import { loadBundledModule } from '../load-parts.js';
-const mod = await loadBundledModule(new URL('../_parts/locale-zh-CN', import.meta.url).href, 4);
+import { loadGzipBundledModule } from '../load-gzip-module.js';
+const mod = await loadGzipBundledModule(new URL('../_parts/locale-zh-CN.gz.b64', import.meta.url).href);
 export default mod.default;
