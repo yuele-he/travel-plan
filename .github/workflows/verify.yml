@@ -1,0 +1,62 @@
+name: Verify travel persona build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reconstruct bundled sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat src/_parts/app.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d > /tmp/app.mjs
+          cat src/_parts/data.{1,2,3,4,5,6}.b64 | tr -d '\n\r ' | base64 -d > /tmp/data.mjs
+          base64 -d src/_parts/locale-zh-CN.gz.b64 | gzip -dc > /tmp/zh-CN.mjs
+          cat src/_parts/locale-en.gz.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d | gzip -dc > /tmp/en.mjs
+          cat src/_parts/locale-zh-Hant7.{1,2,3}.b64 | tr -d '\n\r ' | base64 -d | gzip -dc > /tmp/zh-Hant.mjs
+      - name: Syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check /tmp/app.mjs
+          node --check /tmp/data.mjs
+          node --check /tmp/zh-CN.mjs
+          node --check /tmp/zh-Hant.mjs
+          node --check /tmp/en.mjs
+          node --check src/app.js
+          node --check src/data.js
+          node --check src/load-parts.js
+          node --check src/load-gzip-module.js
+          node --check src/load-gzip-parts.js
+          node --check src/locales/index.js
+          node --check src/locales/zh-CN.js
+          node --check src/locales/zh-Hant.js
+          node --check src/locales/en.js
+      - name: Product data smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const dataMod = await import('file:///tmp/data.mjs');
+          const d = dataMod.DATA;
+          if (!d) throw new Error('DATA export missing');
+          if (d.core?.length !== 12) throw new Error(`Expected 12 core questions, got ${d.core?.length}`);
+          if (!Array.isArray(d.personas) || d.personas.length !== 17) throw new Error(`Expected 17 personas, got ${d.personas?.length}`);
+          if (!Array.isArray(d.eggs) || d.eggs.length < 3) throw new Error('Easter egg pool missing');
+          for (const file of ['zh-CN','zh-Hant','en']) {
+            const mod = await import(`file:///tmp/${file}.mjs`);
+            const obj = mod.default;
+            const n = Object.keys(obj || {}).length;
+            if (n < 450) throw new Error(`${file} locale too small: ${n} keys`);
+            console.log(`${file}: ${n} locale keys`);
+          }
+          console.log(`personas=${d.personas.length}, core=${d.core.length}, branches=${d.branches?.length}, eggs=${d.eggs.length}`);
+          NODE
