@@ -1,3 +1,3 @@
-import { loadBundledModule } from './load-parts.js';
-const mod = await loadBundledModule(new URL('./_parts/data', import.meta.url).href, 6);
+import { loadGzipParts } from './load-gzip-parts.js';
+const mod = await loadGzipParts(new URL('./_parts/data.gz', import.meta.url).href, 3);
 export const DATA = mod.DATA;
