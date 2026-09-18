@@ -3,3 +3,23 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+# Never commit secrets or private planner data to this public delivery repo.
+.env
+.env.*
+*.secret.*
+*.pem
+*.key
+
+private/
+planner-private/
+customer-data/
+trip-data/
+research-private/
+skills-private/
+schemas-private/
+
+guide/private/
+guide/customer-data/
+guide/*.local.json
+guide/*-canonical.json
