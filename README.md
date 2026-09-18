@@ -1,6 +1,10 @@
 # Travel Plan
 
-This repository contains travel-related frontend experiments.
+This repository is the **public browser delivery layer** for the travel-planning product.
+
+It contains interfaces that customers are allowed to receive in their browsers. Private planning logic, customer canonical data, research work, credentials, and the Travel Planner Skill must stay outside this public repository.
+
+See [docs/PRIVACY_ARCHITECTURE.md](docs/PRIVACY_ARCHITECTURE.md).
 
 ## Current canonical travel questionnaire
 
@@ -27,90 +31,100 @@ Current V4 behavior:
 - there is no server-side order submission yet;
 - the current export/download behavior is for testing.
 
-Next product phase:
+## Final Guide
+
+The customer-facing permanent guide renderer lives at:
+
+```text
+guide/
+```
+
+Public URL after deployment:
+
+https://yuele-he.github.io/travel-plan/guide/
+
+The public Guide is intentionally a **thin renderer**. It should receive a display-ready Guide View Model from a private backend.
+
+The browser must not contain the private planning engine. In particular, these decisions should be calculated server-side before the page receives them:
+
+- booking lifecycle state;
+- fixed-transport leave-by time;
+- restaurant primary/backup selection;
+- fallback selection;
+- photo/visual timing;
+- routing and planning QA decisions.
+
+`guide/demo.json` contains synthetic product-demo data only.
+
+## Privacy boundary
+
+Do not commit any of the following here:
+
+- Travel Planner Skill or private schemas;
+- trip_profile / planning_facts / candidate_experiences / customer_choices;
+- preference_updates / booking_requirements / customer_actions;
+- fixed_commitments / experience_guidance / day_carry / itinerary / qa_report;
+- customer screenshots, identity or booking records;
+- API keys, CloudBase credentials, GitHub tokens, or other secrets.
+
+The production flow is:
+
+```text
+private planner + private backend
+        ↓
+private canonical trip data
+        ↓
+server-side Guide View Model
+        ↓
+public /guide/ renderer
+```
+
+Anything sent to a browser can be inspected. Repository privacy, backend separation, and secret handling are the actual security boundaries; minification is not.
+
+## Existing Travel Persona prototype
+
+The repository root still contains the earlier **Travel Persona / 旅游人设测试** frontend.
+
+```text
+travel-plan/
+├─ index.html
+├─ questionnaire-v4/
+├─ guide/
+├─ src/
+├─ styles/
+├─ docs/
+├─ VERSIONING.md
+└─ README.md
+```
+
+## Next product phase
 
 - Tencent CloudBase backend;
 - order creation and permanent customer links;
 - server-side draft persistence;
 - server-side screenshot storage;
+- private canonical planning artifacts;
+- Final Guide View Model API;
 - admin order view;
 - one-click AI export package.
 
 See [VERSIONING.md](VERSIONING.md) for the repository versioning rule.
 
----
-
-## Existing travel-persona prototype
-
-The repository root also contains the earlier **Travel Persona / 旅游人设测试** frontend.
-
-The earlier prototype was a single HTML file. The repo edition keeps the same product logic in a normal repository structure:
-
-```text
-travel-plan/
-├─ index.html
-├─ src/
-│  ├─ app.js
-│  ├─ config.js
-│  ├─ feedback.js
-│  ├─ data.js
-│  └─ locales/
-│     ├─ zh-CN.js
-│     ├─ zh-Hant.js
-│     ├─ en.js
-│     └─ index.js
-├─ styles/main.css
-├─ docs/
-├─ questionnaire-v4/
-├─ _headers
-├─ VERSIONING.md
-└─ README.md
-```
-
 ## Local development
 
-ES modules need an HTTP server; don't double-click `index.html` from `file://`.
+ES modules and JSON fetches need an HTTP server; do not rely on `file://`.
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open `http://localhost:8000`.
-
-For the questionnaire:
+Then open:
 
 ```text
 http://localhost:8000/questionnaire-v4/
+http://localhost:8000/guide/
 ```
-
-## Debug mode
-
-Travel-persona normal friend link:
-
-```text
-https://your-site.example/
-```
-
-Developer view:
-
-```text
-https://your-site.example/?debug=1
-```
-
-Only debug mode shows scoring details, dynamic-question path, contradiction state, and Top persona data.
-
-## Feedback
-
-The travel-persona result page has a lightweight accuracy feedback card. By default, submitting feedback copies a structured JSON payload so a friend can paste it back to you in WeChat/WhatsApp/etc.
-
-If you later create your own endpoint, put it in `src/config.js` as `FEEDBACK_ENDPOINT`; the same form will POST JSON there instead.
 
 ## Suggested Git workflow
 
-Use `main` for the friend-testing version and a `dev` branch for experiments.
-
-## Deployment
-
-This repository is public for friend testing. The current questionnaire and travel-persona pages are client-side, so frontend source delivered to the browser can be inspected.
-
-Server-side order persistence and private planning workflows will be added separately in the backend phase.
+Use `main` for the deployable public version and short-lived branches for experiments. Do not create parallel canonical questionnaire or Guide folders for routine fixes.
