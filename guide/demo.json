@@ -1,0 +1,170 @@
+{
+  "header": {
+    "title": "重庆 · 4天攻略",
+    "meta": "2026-10-02–2026-10-05 · 2人 · 演示数据"
+  },
+  "today": {
+    "title": "10月4日 · 山城步行 + 黄昏夜景",
+    "summary": "白天控制坡梯强度，傍晚把重点留给夜景和拍照。",
+    "alerts": [
+      {
+        "tone": "urgent",
+        "title": "今天 10:00 开放预约",
+        "text": "现在可以处理。若预约失败，普通可选体验使用已核实 fallback；hard must 不会静默替换。",
+        "badge": {"text": "现在要做", "tone": "now"}
+      }
+    ],
+    "carry": [
+      {"item": "舒服鞋", "reason": "今天有连续坡梯和步行"},
+      {"item": "充电宝", "reason": "傍晚导航和拍照使用较多"}
+    ],
+    "flow": [
+      {
+        "type": "experience",
+        "time": "10:00–12:00",
+        "title": "山城巷慢走",
+        "subtitle": "入口敏感 · 坡梯较多",
+        "description": "从已核实的上侧区域进入，按顺序向下走，减少反向爬坡。",
+        "actions": [
+          {"label": "导航到入口区域", "url": "https://uri.amap.com/search?keyword=%E9%A2%86%E4%BA%8B%E5%B7%B7%20%E9%87%8D%E5%BA%86", "primary": true}
+        ],
+        "details": [
+          {
+            "title": "怎么玩",
+            "items": [
+              "从上侧区域进入，不从下方反向爬坡",
+              "沿老街段慢慢向下，拍照点顺路完成",
+              "如果腿累，提前结束并直接进入下一段"
+            ]
+          },
+          {
+            "title": "注意事项",
+            "items": [
+              "入口目前只核到区域级位置，正式订单会继续做 POI recheck",
+              "雨天石阶可能更滑"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "transition",
+        "title": "下一步：午饭",
+        "description": "打车约 8–15 分钟。刚走完坡梯，优先减少额外步行。",
+        "actions": []
+      },
+      {
+        "type": "experience",
+        "time": "12:20–13:30",
+        "title": "午饭",
+        "subtitle": "主选 + 备选",
+        "description": "先去主选；如果排队超过 30 分钟，直接换附近备选，不现场重新搜索。",
+        "keyline": "先去：示例小面店 · 预算 ¥35–55 / 人；排队 >30 分钟 → 示例江湖菜馆",
+        "details": [
+          {
+            "title": "吃什么 / 备选",
+            "items": [
+              "主选：小面，少辣",
+              "备选：江湖菜，优先无烟或通风位置",
+              "两家都不值得为了排队打乱后面的黄昏时间"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "transition",
+        "title": "下一步：洪崖洞黄昏",
+        "description": "预计 20–35 分钟。目标是在日落前抵达，不把夜景体验排到下午。",
+        "actions": []
+      },
+      {
+        "type": "experience",
+        "time": "17:45–19:30",
+        "title": "洪崖洞黄昏到夜景",
+        "subtitle": "拍照偏好 4★ · timing 已进入排程",
+        "description": "先看黄昏城市层次，再留到灯光稳定后的夜景。",
+        "actions": [
+          {"label": "导航到洪崖洞", "url": "https://uri.amap.com/search?keyword=%E6%B4%AA%E5%B4%96%E6%B4%9E%E6%B0%91%E4%BF%97%E9%A3%8E%E8%B2%8C%E5%8C%BA", "primary": true}
+        ],
+        "details": [
+          {
+            "title": "📷 拍照",
+            "items": [
+              "规划日落约 18:36",
+              "蓝调规划窗口约 18:51–19:09",
+              "不为弱机位反向走很远；以顺路稳定视角为优先"
+            ]
+          },
+          {
+            "title": "下雨 / 太累怎么办",
+            "items": [
+              "改去已核实室内替代体验",
+              "替代转场约 20–35 分钟",
+              "正式订单发布前会再次复核营业和交通状态"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "days": [
+    {
+      "title": "Day 1 · 10月2日 · 抵达与轻松夜游",
+      "summary": "到达后不堆行程。",
+      "blocks": [
+        {"time": "傍晚", "title": "入住与休息", "description": "先恢复体力"},
+        {"time": "晚上", "title": "附近轻松夜游", "description": "只安排低成本体验"}
+      ]
+    },
+    {
+      "title": "Day 2 · 10月3日 · 城市核心区",
+      "summary": "控制区域跳转。",
+      "blocks": [
+        {"time": "上午", "title": "城市步行", "description": "集中一个片区"},
+        {"time": "晚上", "title": "本地餐饮", "description": "不为网红店长时间排队"}
+      ]
+    },
+    {
+      "title": "Day 3 · 10月4日 · 山城步行 + 黄昏夜景",
+      "summary": "摄影 timing 影响实际排程。",
+      "blocks": [
+        {"time": "10:00–12:00", "title": "山城巷慢走", "description": "从上侧往下走"},
+        {"time": "12:20–13:30", "title": "午饭", "description": "主选 + 备选"},
+        {"time": "17:45–19:30", "title": "洪崖洞黄昏到夜景", "description": "覆盖蓝调规划窗口"}
+      ]
+    },
+    {
+      "title": "Day 4 · 10月5日 · 离开重庆",
+      "summary": "固定交通反推离开上一站的时间。",
+      "blocks": [
+        {"time": "16:30 前", "title": "离开上一站", "description": "按机场交通和规划缓冲倒推"},
+        {"time": "19:35", "title": "航班", "description": "固定交通"}
+      ]
+    }
+  ],
+  "tasks": {
+    "now": [
+      {
+        "title": "处理今天开放的预约",
+        "text": "需要本人账号或实名操作。",
+        "badge": {"text": "actionable", "tone": "now"},
+        "done": false
+      }
+    ],
+    "later": [
+      {
+        "title": "下一项预约尚未开放",
+        "text": "现在不用操作；到开放时间网页会自动移动到“现在要做”。",
+        "badge": {"text": "not_open_yet", "tone": "later"},
+        "done": false
+      }
+    ],
+    "done": [
+      {
+        "title": "酒店确认",
+        "text": "已完成。",
+        "badge": {"text": "completed", "tone": "done"},
+        "done": true
+      }
+    ]
+  }
+}
