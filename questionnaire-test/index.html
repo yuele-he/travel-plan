@@ -1797,7 +1797,22 @@ function enhanceControls(root){
 }
 
 </script>
-  <script>
+  
+</head>
+<body>
+  <div class="app">
+    <header class="pageHeader">
+      <div class="brandRow"><span class="logo" data-i18n="app.title"></span><div class="headerTools"><nav class="languageNav" data-i18n-label="nav.language"><button data-locale="zh-CN" lang="zh-CN">简中</button><button data-locale="zh-TW" lang="zh-TW">繁中</button><button data-locale="en" lang="en">EN</button></nav><span class="saveStatus" role="status"><span id="saveState"></span><button id="retrySave" data-i18n="save.retry" hidden></button></span></div></div>
+      <span class="srOnly" id="score">0%</span>
+      <div class="bar" id="progress" role="progressbar" data-i18n-label="nav.progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
+      <nav class="stageNav" id="stageNav" data-i18n-label="nav.categories"></nav>
+      <nav class="questionNav" id="questionNav" data-i18n-label="nav.questions"></nav>
+    </header>
+    <main class="mission" id="card"></main>
+    <footer class="bottom" id="bottom"><button class="nav back" id="back" data-i18n="nav.back"></button><button class="nav next" id="next" data-i18n="nav.next"></button></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
 const STORAGE='cq-trip-web-v4-draft';
 const DB='cq-trip-attachments-v4', STORE='files';
 
@@ -2734,19 +2749,5 @@ render();
 
 
 </script>
-</head>
-<body>
-  <div class="app">
-    <header class="pageHeader">
-      <div class="brandRow"><span class="logo" data-i18n="app.title"></span><div class="headerTools"><nav class="languageNav" data-i18n-label="nav.language"><button data-locale="zh-CN" lang="zh-CN">简中</button><button data-locale="zh-TW" lang="zh-TW">繁中</button><button data-locale="en" lang="en">EN</button></nav><span class="saveStatus" role="status"><span id="saveState"></span><button id="retrySave" data-i18n="save.retry" hidden></button></span></div></div>
-      <span class="srOnly" id="score">0%</span>
-      <div class="bar" id="progress" role="progressbar" data-i18n-label="nav.progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
-      <nav class="stageNav" id="stageNav" data-i18n-label="nav.categories"></nav>
-      <nav class="questionNav" id="questionNav" data-i18n-label="nav.questions"></nav>
-    </header>
-    <main class="mission" id="card"></main>
-    <footer class="bottom" id="bottom"><button class="nav back" id="back" data-i18n="nav.back"></button><button class="nav next" id="next" data-i18n="nav.next"></button></footer>
-  </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
