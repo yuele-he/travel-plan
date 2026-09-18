@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#faf9f6">
+  <title>重庆旅行计划 · 旅行需求</title>
+  <link rel="stylesheet" href="assets/questionnaire.css">
+  <script defer src="assets/jszip.min.js"></script>
+  <script defer src="i18n/runtime.js"></script>
+  <script defer src="i18n/zh-CN.js"></script>
+  <script defer src="i18n/zh-TW.js"></script>
+  <script defer src="i18n/en.js"></script>
+  <script defer src="i18n/legacy.js"></script>
+  <script defer src="assets/components.js"></script>
+  <script defer src="assets/questionnaire.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="pageHeader">
+      <div class="brandRow"><span class="logo" data-i18n="app.title"></span><div class="headerTools"><nav class="languageNav" data-i18n-label="nav.language"><button data-locale="zh-CN" lang="zh-CN">简中</button><button data-locale="zh-TW" lang="zh-TW">繁中</button><button data-locale="en" lang="en">EN</button></nav><span class="saveStatus" role="status"><span id="saveState"></span><button id="retrySave" data-i18n="save.retry" hidden></button></span></div></div>
+      <span class="srOnly" id="score">0%</span>
+      <div class="bar" id="progress" role="progressbar" data-i18n-label="nav.progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
+      <nav class="stageNav" id="stageNav" data-i18n-label="nav.categories"></nav>
+      <nav class="questionNav" id="questionNav" data-i18n-label="nav.questions"></nav>
+    </header>
+    <main class="mission" id="card"></main>
+    <footer class="bottom" id="bottom"><button class="nav back" id="back" data-i18n="nav.back"></button><button class="nav next" id="next" data-i18n="nav.next"></button></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
