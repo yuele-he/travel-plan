@@ -1,5 +1,2 @@
-This public repository is a delivery target for yuele-he/travel-planner-private.
-
-Canonical editable source lives in the private repository.
-Only browser-required frontend artifacts and public deployment metadata belong here.
-Production customer data must never be committed to this repository.
+This site is built from the private Travel Planner source repository.
+Only browser-required delivery artifacts and public delivery metadata belong here.
