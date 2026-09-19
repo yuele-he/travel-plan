@@ -36,19 +36,28 @@
     return data;
   }
 
+  function safeExternalUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(String(value), location.href);
+      return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+
   function navigationButton(action) {
-    if (!action?.url) return "";
-    return `<a class="btn ${action.primary ? "primary" : ""}" href="${esc(action.url)}" target="_blank" rel="noopener noreferrer">${esc(action.label || "导航")}</a>`;
+    const url = safeExternalUrl(action?.url);
+    if (!url) return "";
+    return `<a class="btn ${action.primary ? "primary" : ""}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(action.label || "导航")}</a>`;
   }
 
   function detailsHtml(details = []) {
     if (!details.length) return "";
     return `<div class="details">${details.map((d) => {
-      const body = d.html
-        ? d.html
-        : d.items?.length
-          ? `<ul>${d.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`
-          : `<p>${esc(d.text || "")}</p>`;
+      const body = d.items?.length
+        ? `<ul>${d.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`
+        : `<p>${esc(d.text || "")}</p>`;
       return `<details><summary>${esc(d.title)}</summary>${body}</details>`;
     }).join("")}</div>`;
   }
