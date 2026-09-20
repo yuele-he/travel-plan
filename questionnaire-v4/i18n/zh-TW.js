@@ -381,6 +381,7 @@ I18N['zh-TW']={
   "success.chongqing_trip_details": "重慶旅行需求資料包",
   "success.file_sharing_is_not_supported_here_downloading_instead": "當前瀏覽器不支援檔案分享，已改為下載",
   "success.copied": "已複製",
+  "success.copy_failed": "複製失敗，請展開下方需求內容後長按複製",
   "accessibility.enter_your_answer": "填寫答案",
   "accessibility.screenshot": "截圖",
   "app.title": "重慶旅行計劃",

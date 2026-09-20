@@ -389,6 +389,7 @@ I18N['en']={
   "success.chongqing_trip_details": "Chongqing trip request package",
   "success.file_sharing_is_not_supported_here_downloading_instead": "File sharing is not supported here. Downloading instead.",
   "success.copied": "Copied",
+  "success.copy_failed": "Copy failed. Open the trip details below and copy the text manually.",
   "accessibility.enter_your_answer": "Enter your answer",
   "accessibility.screenshot": " screenshot",
   "app.document_title": "Chongqing Trip Planner · Trip details",

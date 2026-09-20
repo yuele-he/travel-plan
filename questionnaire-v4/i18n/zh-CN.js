@@ -381,6 +381,7 @@ I18N['zh-CN']={
   "success.chongqing_trip_details": "重庆旅行需求资料包",
   "success.file_sharing_is_not_supported_here_downloading_instead": "当前浏览器不支持文件分享，已改为下载",
   "success.copied": "已复制",
+  "success.copy_failed": "复制失败，请展开下方需求内容后长按复制",
   "accessibility.enter_your_answer": "填写答案",
   "accessibility.screenshot": "截图",
   "app.title": "重庆旅行计划",

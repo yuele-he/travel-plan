@@ -84,6 +84,25 @@ function toast(msg){
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),1100);
 }
+async function copyPlainText(text){
+  if(navigator.clipboard?.writeText){
+    try{await navigator.clipboard.writeText(text);return true}catch(e){}
+  }
+  const area=document.createElement('textarea');
+  area.value=text;
+  area.setAttribute('readonly','');
+  area.style.position='fixed';
+  area.style.left='-9999px';
+  area.style.top='0';
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  area.setSelectionRange(0,area.value.length);
+  let ok=false;
+  try{ok=document.execCommand('copy')}catch(e){}
+  area.remove();
+  return ok;
+}
 function allCities(){const s=new Set(HOT);Object.values(CITY_GROUPS).forEach(a=>a.forEach(c=>s.add(c)));return [...s]}
 function isDayTrip(){return !!P.trip.start_date&&P.trip.start_date===P.trip.end_date}
 function needLodging(){return !isDayTrip() && (!P.known.hotel || P.hotel.coverage==='partial')}
@@ -885,8 +904,8 @@ function wireManualDeliveryActions(text){
 
   const copy=document.getElementById('copyText');
   if(copy)copy.onclick=async()=>{
-    await navigator.clipboard.writeText(text);
-    toast(tr('success.copied'));
+    const ok=await copyPlainText(text);
+    toast(ok?tr('success.copied'):tr('success.copy_failed'));
   };
 
   const download=document.getElementById('downloadPack');
