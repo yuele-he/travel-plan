@@ -461,4 +461,16 @@ I18N['zh-TW']={
   "unit.minutes.one": "{n} 分鐘",
   "upload.count.one": "已上傳 {n} 張",
   "review.missing.one": "還有 {n} 項沒填完整"
+  "success.submitting": "正在提交旅行需求…",
+  "success.submitted_title": "旅行需求已提交",
+  "success.submitted_body": "我們已經收到你的旅行需求，可以開始為你整理行程。",
+  "success.order_id": "訂單號",
+  "success.guide_link": "我的專屬攻略連結",
+  "success.guide_link_note": "攻略完成後，這個連結會直接顯示最終行程。建議先保存。",
+  "success.copy_guide_link": "複製攻略連結",
+  "success.cloud_fallback_title": "自動提交暫時不可用",
+  "success.cloud_fallback_body": "你的內容沒有遺失。請先下載或分享需求資料包，作為本次提交的備份。",
+  "success.backup_download": "下載資料備份",
+  "success.backup_share": "分享資料備份",
+  "success.guide_link_copied": "攻略連結已複製",
 };
