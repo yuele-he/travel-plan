@@ -473,4 +473,10 @@ I18N['zh-TW']={
   "success.backup_download": "下載資料備份",
   "success.backup_share": "分享資料備份",
   "success.guide_link_copied": "攻略連結已複製",
+  "success.manual_title": "需求已整理好",
+  "success.manual_body": "請先複製下面的旅行需求內容，傳給規劃師。",
+  "success.manual_copy": "複製旅行需求",
+  "success.manual_images_title": "如果上傳過圖片，請把圖片另外傳給規劃師",
+  "success.manual_images_body": "例如酒店、機票、車票或固定活動截圖。文字需求和圖片分開傳送即可。",
+  "success.manual_backup_note": "下面的資料包只是備用，不是必須傳送。",
 };
