@@ -461,4 +461,16 @@ I18N['en']={
   "unit.minutes.one": "{n} minute",
   "upload.count.one": "{n} image uploaded",
   "review.missing.one": "{n} item still needs attention"
+  "success.submitting": "Submitting your trip request…",
+  "success.submitted_title": "Trip request submitted",
+  "success.submitted_body": "We have received your trip request and can start preparing your plan.",
+  "success.order_id": "Order ID",
+  "success.guide_link": "My personal guide link",
+  "success.guide_link_note": "When your guide is ready, this link will show the final itinerary. Save it now.",
+  "success.copy_guide_link": "Copy guide link",
+  "success.cloud_fallback_title": "Automatic submission is temporarily unavailable",
+  "success.cloud_fallback_body": "Your answers are safe. Please download or share the trip package as a backup for this request.",
+  "success.backup_download": "Download backup",
+  "success.backup_share": "Share backup",
+  "success.guide_link_copied": "Guide link copied",
 };
