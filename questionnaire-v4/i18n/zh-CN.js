@@ -460,7 +460,7 @@ I18N['zh-CN']={
   "unit.stars.one": "{n} 星",
   "unit.minutes.one": "{n} 分钟",
   "upload.count.one": "已上传 {n} 张",
-  "review.missing.one": "还有 {n} 项没填完整"
+  "review.missing.one": "还有 {n} 项没填完整",
   "success.submitting": "正在提交旅行需求…",
   "success.submitted_title": "旅行需求已提交",
   "success.submitted_body": "我们已经收到你的旅行需求，可以开始为你整理行程。",

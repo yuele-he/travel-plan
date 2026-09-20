@@ -460,7 +460,7 @@ I18N['en']={
   "unit.stars.one": "{n} star",
   "unit.minutes.one": "{n} minute",
   "upload.count.one": "{n} image uploaded",
-  "review.missing.one": "{n} item still needs attention"
+  "review.missing.one": "{n} item still needs attention",
   "success.submitting": "Submitting your trip request…",
   "success.submitted_title": "Trip request submitted",
   "success.submitted_body": "We have received your trip request and can start preparing your plan.",
