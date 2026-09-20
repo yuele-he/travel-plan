@@ -278,29 +278,26 @@ function renderKnown(){
     ${ChoiceCard(tr('question.known.nothing_yet'),'',none,'none',true)}
   </div>`;
 }
-function attachmentSection(cat,title,manual,placeholder,extra=''){
-  const meta=P.attachments[cat]||[];
+function materialSection(cat,title,manual,placeholder,extra=''){
   return `<div class="uploadGroup">
-    <div class="uploadGroupTitle"><b>${title}</b><span>${meta.length?esc(tr('upload.count',{n:meta.length})):''}</span></div>
-    <label class="smallUpload">${esc(tr('upload.upload_screenshot'))}<input class="fileInput" data-cat="${cat}" type="file" multiple accept="image/jpeg,image/png,image/webp"></label>
-    <div class="files">${meta.map(x=>`<div class="fileRow"><img class="thumbnail" data-thumbnail="${esc(x.id)}" alt="${esc(tr('upload.preview',{name:title}))}" width="56" height="56"><span class="fileMeta"><b>${esc(x.name)}</b><small>${Math.ceil(x.size/1024)} KB</small></span><button class="remove" data-remove-file="${esc(x.id)}" data-cat="${cat}" aria-label="${esc(tr('upload.delete',{name:x.name}))}">${esc(tr('upload.delete_action'))}</button></div>`).join('')}</div>
-    <details class="disclosure" data-manual-section="${cat}" ${manual||manualSections.has(cat)?'open':''}><summary>${esc(tr('upload.no_screenshot_enter_the_details_instead'))}</summary><div class="field"><label class="label">${esc(tr('upload.details',{name:title}))}</label><textarea class="area" data-manual="${cat}" placeholder="${esc(placeholder)}">${esc(manual||'')}</textarea></div></details>
+    <div class="uploadGroupTitle"><b>${title}</b></div>
+    <div class="field"><textarea class="area" data-manual="${cat}" placeholder="${esc(placeholder)}">${esc(manual||'')}</textarea></div>
     ${extra}
   </div>`;
 }
 function renderMaterials(){
   let out=`<div class="privacy">${esc(tr('question.materials.you_can_hide_order_numbers_phone_numbers_and'))}</div>`;
   if(P.known.hotel&&!isDayTrip()){
-    out+=attachmentSection('hotel',tr('question.known.hotel'),P.hotel.manual_note,tr('question.materials.for_example_ji_hotel_chongqing_jiefangbei_oct_2'),
+    out+=materialSection('hotel',tr('question.known.hotel'),P.hotel.manual_note,tr('question.materials.for_example_ji_hotel_chongqing_jiefangbei_oct_2'),
       `<div class="subblock"><div class="subhead">${esc(tr('question.materials.do_these_hotel_bookings_cover_your_whole_trip'))}</div>
       <div class="inlineChoices">
         <button class="inlineChoice ${P.hotel.coverage==='all'?'sel':''}" data-coverage="all">${esc(tr('value.all'))}</button>
         <button class="inlineChoice ${P.hotel.coverage==='partial'?'sel':''}" data-coverage="partial">${esc(tr('value.partial'))}</button>
       </div></div>`);
   }
-  if(P.known.inbound)out+=attachmentSection('inbound',tr('question.known.travel_to_chongqing'),P.transport.inbound_manual,tr('question.materials.for_example_oct_2_14_06_shanghai_south'));
-  if(P.known.outbound)out+=attachmentSection('outbound',tr('question.known.travel_from_chongqing'),P.transport.outbound_manual,tr('question.materials.for_example_oct_5_19_35_chongqing_jiangbei'));
-  if(P.known.fixed_event)out+=attachmentSection('event',tr('question.materials.fixed_plans_reservations'),P.event.manual_note,tr('question.materials.for_example_oct_3_19_30_a_show'));
+  if(P.known.inbound)out+=materialSection('inbound',tr('question.known.travel_to_chongqing'),P.transport.inbound_manual,tr('question.materials.for_example_oct_2_14_06_shanghai_south'));
+  if(P.known.outbound)out+=materialSection('outbound',tr('question.known.travel_from_chongqing'),P.transport.outbound_manual,tr('question.materials.for_example_oct_5_19_35_chongqing_jiangbei'));
+  if(P.known.fixed_event)out+=materialSection('event',tr('question.materials.fixed_plans_reservations'),P.event.manual_note,tr('question.materials.for_example_oct_3_19_30_a_show'));
   return out;
 }
 function renderTravelBounds(){
@@ -539,10 +536,10 @@ function pageIssues(id){
   if(id==='known'&&!P.answered.known)add(tr('validation.confirm_what_you_have_already_booked_or_decided'));
   if(id==='materials'){
     const ok=cat=>{
-      if(cat==='hotel')return P.attachments.hotel.length>0||P.hotel.manual_note.trim();
-      if(cat==='inbound')return P.attachments.inbound.length>0||P.transport.inbound_manual.trim();
-      if(cat==='outbound')return P.attachments.outbound.length>0||P.transport.outbound_manual.trim();
-      if(cat==='event')return P.attachments.event.length>0||P.event.manual_note.trim();
+      if(cat==='hotel')return P.hotel.manual_note.trim();
+      if(cat==='inbound')return P.transport.inbound_manual.trim();
+      if(cat==='outbound')return P.transport.outbound_manual.trim();
+      if(cat==='event')return P.event.manual_note.trim();
       return true;
     };
     if(P.known.hotel&&!isDayTrip()&&!ok('hotel'))add(tr('validation.upload_a_hotel_screenshot_or_enter_the_details'));
@@ -680,31 +677,13 @@ function wire(id){
     });
   }
   if(id==='materials'){
-    card.querySelectorAll('[data-manual-section]').forEach(section=>section.ontoggle=()=>{
-      if(!section.isConnected)return;
-      if(section.open)manualSections.add(section.dataset.manualSection);else manualSections.delete(section.dataset.manualSection);
-    });
-    document.querySelectorAll('.fileInput').forEach(inp=>inp.onchange=async e=>{
-      const cat=e.target.dataset.cat;
-      for(const f of [...e.target.files]){
-        if(!['image/jpeg','image/png','image/webp'].includes(f.type)){toast(tr('feedback.please_use_jpg_png_or_webp'));continue}
-        if(f.size>10*1024*1024){toast(tr('feedback.each_image_must_be_10_mb_or_smaller'));continue}
-        const rec=await idbPut(cat,f);
-        P.attachments[cat].push({id:rec.id,name:rec.name,size:rec.size,type:rec.type});
-      }
-      save();render();
-    });
-    document.querySelectorAll('[data-remove-file]').forEach(b=>b.onclick=async()=>{
-      const cat=b.dataset.cat,id=b.dataset.removeFile;
-      await idbDelete(id);P.attachments[cat]=P.attachments[cat].filter(x=>x.id!==id);save();render();
-    });
     document.querySelectorAll('[data-manual]').forEach(t=>t.oninput=e=>{
       const cat=e.target.dataset.manual;
       if(cat==='hotel')P.hotel.manual_note=e.target.value;
       if(cat==='inbound')P.transport.inbound_manual=e.target.value;
       if(cat==='outbound')P.transport.outbound_manual=e.target.value;
       if(cat==='event')P.event.manual_note=e.target.value;
-      updateNext();
+      save();updateNext();
     });
     document.querySelectorAll('[data-coverage]').forEach(b=>b.onclick=()=>{P.hotel.coverage=b.dataset.coverage;save();render()});
   }
@@ -859,7 +838,7 @@ function reviewData(){
   if(P.party.type==='family')basic.push(row('family',list(P.party.family_members,'family')));
   if(P.party.type==='family'&&P.party.family_members.includes('child'))basic.push(row('ages',P.party.child_ages));
   const bookings=[];
-  const material=(cat,label,note)=>bookings.push(row(label,tr('upload.count',{n:P.attachments[cat].length})+(note?' · '+note:'')));
+  const material=(cat,label,note)=>bookings.push(row(label,note||tr('common.unfilled')));
   if(P.known.hotel&&!isDayTrip()){material('hotel','hotel',P.hotel.manual_note);bookings.push(row('coverage',valLabel(P.hotel.coverage)))}
   if(P.known.inbound)material('inbound','inbound',P.transport.inbound_manual);else bookings.push(row('first_day',valLabel(P.trip.first_day_window)));
   if(P.known.outbound)material('outbound','outbound',P.transport.outbound_manual);else bookings.push(row('last_day',valLabel(P.trip.last_day_window)));
@@ -889,15 +868,10 @@ async function buildZip(){
   const zip=new JSZip();
   const exportP=JSON.parse(JSON.stringify(P));
   exportP.locale=locale;exportP.submitted=true;exportP.exported_at=new Date().toISOString();
+  exportP.attachments={hotel:[],inbound:[],outbound:[],event:[]};
   zip.file('travel_order.json',JSON.stringify(exportP,null,2));
   zip.file('travel_request.txt',buildText());
   zip.file('README.txt',tr('export.chongqing_trip_request_package_read_travel_order_json'));
-  const active={hotel:P.known.hotel&&!isDayTrip(),inbound:P.known.inbound,outbound:P.known.outbound,event:P.known.fixed_event};
-  for(const r of await idbAll()){
-    if(!active[r.category])continue;
-    const safe=(r.name||'attachment').replace(/[\/:*?\x22<>|]/g,'_');
-    zip.file(`attachments/${r.category}/${r.id}_${safe}`,r.blob);
-  }
   return await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
 }
 let successVisible=false;
