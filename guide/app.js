@@ -208,7 +208,9 @@
   function showError(err) {
     const banner = $("#statusBanner");
     banner.classList.remove("hidden");
-    banner.textContent = "攻略暂时无法加载。请稍后重试，或联系旅行规划师。";
+    banner.textContent = err?.code === "GUIDE_NOT_READY"
+      ? "你的攻略正在准备中，请稍后再来查看。"
+      : "攻略暂时无法加载。请稍后重试，或联系旅行规划师。";
     $("#today").innerHTML = '<div class="empty">没有可显示的数据。</div>';
     console.error(err);
   }
