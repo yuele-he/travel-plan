@@ -23,7 +23,7 @@ function fresh(){
     party:{type:'',size:null,family_members:[],child_ages:''},
     known:{hotel:false,inbound:false,outbound:false,user_places:false,fixed_event:false},
     answered:{known:false,must_places:false,dietary:false,hard_rules:false},
-    hotel:{coverage:'none',plan:'',manual_note:'',stay_style:'',budget_per_room:'',prefs:[],pref_other:''},
+    hotel:{coverage:'none',plan:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:''},
     transport:{inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:''},
     event:{type:'',window:'',manual_note:''},
     places:{quick:[],pasted:'',must:[]},
@@ -44,7 +44,8 @@ function load(){
     const x=JSON.parse(localStorage.getItem(STORAGE));
     if(x?.schema_version==='chongqing_trip_order_v4'){
       const d=migrateDraft(x);
-      d.hotel={coverage:'none',plan:'',manual_note:'',stay_style:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
+      d.hotel={coverage:'none',plan:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
+      if(!d.hotel.budget_total_per_night&&d.hotel.budget_per_room)d.hotel.budget_total_per_night=d.hotel.budget_per_room;
       d.transport={inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:'',...(d.transport||{})};
       d.event={type:'',window:'',manual_note:'',...(d.event||{})};
       return d;
@@ -435,7 +436,7 @@ function renderStayStyle(){
   <div class="infoLine">${esc(tr('question.stay_style.we_will_check_how_many_guests_each_room'))}</div>`;
 }
 function renderHotelBudget(){
-  const v=P.hotel.budget_per_room;
+  const v=P.hotel.budget_total_per_night;
   const prefs=['near_metro','quiet','bathtub','view','laundry','parking','none','other'];
   return `<div class="subblock">
     <div class="subhead">${esc(tr('question.hotel_budget.about_how_much_would_you_like_to_spend'))}</div>
@@ -649,7 +650,7 @@ function pageIssues(id){
   if(id==='must_places'&&(!P.answered.must_places||P.places.must.some(n=>!selectedPlaceNames().includes(n))))add(tr('validation.confirm_your_must_visits_from_your_current_wanted'));
   if(id==='lodging_plan'&&!['area_only','shortlist','later'].includes(P.hotel.plan))add(tr('validation.choose_lodging_plan'));
   if(id==='stay_style'&&!stayOptions().some(([,v])=>v===P.hotel.stay_style))add(tr('validation.choose_a_room_arrangement_for_your_group'));
-  if(id==='hotel_budget'&&!P.hotel.budget_per_room)add(tr('validation.choose_your_hotel_budget_per_room_per_night'));
+  if(id==='hotel_budget'&&!P.hotel.budget_total_per_night)add(tr('validation.choose_your_hotel_budget_per_room_per_night'));
   if(id==='driving'&&!P.driving.mode)add(tr('validation.confirm_whether_you_will_drive_or_rent_a'));
   if(id==='day_start'){
     if(!P.schedule.usual_start)add(tr('validation.choose_your_usual_start_time'));
@@ -729,7 +730,7 @@ function wire(id){
       if(!P.trip.start_date||P.trip.end_date){P.trip.start_date=d;P.trip.end_date='';}
       else{
         if(d<P.trip.start_date){P.trip.end_date=P.trip.start_date;P.trip.start_date=d}else P.trip.end_date=d;
-        if(isDayTrip()){P.hotel.coverage='none';P.hotel.plan='';P.hotel.stay_style='';P.hotel.budget_per_room='';}
+        if(isDayTrip()){P.hotel.coverage='none';P.hotel.plan='';P.hotel.stay_style='';P.hotel.budget_total_per_night='';}
       }
       save();
       if(P.trip.end_date)autoNext();else render();
@@ -824,7 +825,7 @@ function wire(id){
       P.hotel.plan=b.dataset.value;
       if(P.hotel.plan!=='shortlist'){
         P.hotel.stay_style='';
-        P.hotel.budget_per_room='';
+        P.hotel.budget_total_per_night='';
         P.hotel.prefs=[];
         P.hotel.pref_other='';
       }
@@ -835,7 +836,7 @@ function wire(id){
     document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{P.hotel.stay_style=b.dataset.value;save();autoNext()});
   }
   if(id==='hotel_budget'){
-    document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{P.hotel.budget_per_room=b.dataset.value;save();render()});
+    document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{P.hotel.budget_total_per_night=b.dataset.value;save();render()});
     document.querySelectorAll('[data-hotel-pref]').forEach(b=>b.onclick=()=>{
       const x=b.dataset.hotelPref;
       if(x==='none')P.hotel.prefs=['none'];
@@ -985,7 +986,7 @@ function reviewData(){
   if(needsLodgingPlan()&&P.hotel.plan){
     bookings.push(row('lodging_plan',tr('lodging.plan.'+P.hotel.plan)));
   }
-  const lodging=[row('rooms',valLabel(P.hotel.stay_style)),row('hotel_budget',valLabel(P.hotel.budget_per_room)),row('hotel_prefs',P.hotel.prefs.length?list(P.hotel.prefs,'hotel'):tr('common.unspecified'))];
+  const lodging=[row('rooms',valLabel(P.hotel.stay_style)),row('hotel_budget',valLabel(P.hotel.budget_total_per_night)),row('hotel_prefs',P.hotel.prefs.length?list(P.hotel.prefs,'hotel'):tr('common.unspecified'))];
   if(P.hotel.pref_other&&P.hotel.prefs.includes('other'))lodging.push(row('note',P.hotel.pref_other));
   const transport=[row('driving',valLabel(P.driving.mode)),row('usual_start',custom(P.schedule.usual_start)),row('earliest',custom(P.schedule.earliest_start)),row('usual_return',custom(P.schedule.usual_return)),row('latest',P.schedule.latest_return==='open'?tr('common.unlimited'):custom(P.schedule.latest_return)),row('usual_steps',valLabel(P.mobility.usual_steps)),row('max_steps',P.mobility.hard_steps?tr('unit.steps',{n:P.mobility.hard_steps}):tr('common.unfilled')),row('stairs',valLabel(P.mobility.stairs))];
   if(!fullTimeDriving())transport.push(row('taxi',P.local_transport.taxi_cap==='open'?tr('common.unlimited'):P.local_transport.taxi_cap===undefined?tr('common.unfilled'):'¥'+P.local_transport.taxi_cap));
