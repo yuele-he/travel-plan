@@ -473,4 +473,10 @@ I18N['en']={
   "success.backup_download": "Download backup",
   "success.backup_share": "Share backup",
   "success.guide_link_copied": "Guide link copied",
+  "success.manual_title": "Your trip request is ready",
+  "success.manual_body": "Copy the trip request below and send it to your planner.",
+  "success.manual_copy": "Copy trip request",
+  "success.manual_images_title": "If you uploaded images, send them to your planner separately",
+  "success.manual_images_body": "For example: hotel, flight, train, or fixed-event screenshots. Send the text request and images separately.",
+  "success.manual_backup_note": "The package below is only an optional backup.",
 };

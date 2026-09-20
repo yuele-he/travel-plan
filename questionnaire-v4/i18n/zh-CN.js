@@ -473,4 +473,10 @@ I18N['zh-CN']={
   "success.backup_download": "下载资料备份",
   "success.backup_share": "分享资料备份",
   "success.guide_link_copied": "攻略链接已复制",
+  "success.manual_title": "需求已整理好",
+  "success.manual_body": "请先复制下面的旅行需求内容，发给规划师。",
+  "success.manual_copy": "复制旅行需求",
+  "success.manual_images_title": "如果上传过图片，请把图片另外发给规划师",
+  "success.manual_images_body": "例如酒店、机票、车票或固定活动截图。文字需求和图片分开发送即可。",
+  "success.manual_backup_note": "下面的资料包只是备用，不是必须发送。",
 };
