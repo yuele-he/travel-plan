@@ -23,7 +23,7 @@ function fresh(){
     party:{type:'',size:null,family_members:[],child_ages:''},
     known:{hotel:false,inbound:false,outbound:false,user_places:false,fixed_event:false},
     answered:{known:false,must_places:false,dietary:false,hard_rules:false},
-    hotel:{coverage:'none',manual_note:'',stay_style:'',budget_per_room:'',prefs:[],pref_other:''},
+    hotel:{coverage:'none',plan:'',manual_note:'',stay_style:'',budget_per_room:'',prefs:[],pref_other:''},
     transport:{inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:''},
     event:{type:'',window:'',manual_note:''},
     places:{quick:[],pasted:'',must:[]},
@@ -44,6 +44,7 @@ function load(){
     const x=JSON.parse(localStorage.getItem(STORAGE));
     if(x?.schema_version==='chongqing_trip_order_v4'){
       const d=migrateDraft(x);
+      d.hotel={coverage:'none',plan:'',manual_note:'',stay_style:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
       d.transport={inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:'',...(d.transport||{})};
       d.event={type:'',window:'',manual_note:'',...(d.event||{})};
       return d;
@@ -110,7 +111,8 @@ async function copyPlainText(text){
 }
 function allCities(){const s=new Set(HOT);Object.values(CITY_GROUPS).forEach(a=>a.forEach(c=>s.add(c)));return [...s]}
 function isDayTrip(){return !!P.trip.start_date&&P.trip.start_date===P.trip.end_date}
-function needLodging(){return !isDayTrip() && (!P.known.hotel || P.hotel.coverage==='partial')}
+function needsLodgingPlan(){return !isDayTrip() && (!P.known.hotel || P.hotel.coverage==='partial')}
+function needsHotelShortlist(){return needsLodgingPlan() && P.hotel.plan==='shortlist'}
 function hasBookedMaterials(){return (P.known.hotel&&!isDayTrip())||P.known.inbound||P.known.outbound||P.known.fixed_event}
 function needsTravelBounds(){return !P.known.inbound||!P.known.outbound}
 function fullTimeDriving(){return ['self','rental'].includes(P.driving.mode)}
@@ -129,7 +131,10 @@ function steps(){
     S.push({id:'places',stage:'bookings',title:tr('question.places.title')});
     S.push({id:'must_places',stage:'bookings',title:tr('question.must_places.title')});
   }
-  if(needLodging()){
+  if(needsLodgingPlan()){
+    S.push({id:'lodging_plan',stage:'lodging',title:tr('question.lodging_plan.title'),help:tr('question.lodging_plan.help')});
+  }
+  if(needsHotelShortlist()){
     S.push({id:'stay_style',stage:'lodging',title:tr('question.stay_style.title')});
     S.push({id:'hotel_budget',stage:'lodging',title:tr('question.hotel_budget.title')});
   }
@@ -167,7 +172,7 @@ function shortQuestionLabel(id){
   return ({
     origin:tr('question.origin.short'),dates:tr('question.dates.short'),party_type:tr('question.party_type.short'),party_details:tr('question.party_details.short'),
     known:tr('question.known.short'),materials:tr('question.materials.short'),travel_bounds:tr('question.travel_bounds.short'),places:tr('question.places.short'),must_places:tr('question.must_places.short'),
-    stay_style:tr('question.stay_style.short'),hotel_budget:tr('question.hotel_budget.short'),
+    lodging_plan:tr('question.lodging_plan.short'),stay_style:tr('question.stay_style.short'),hotel_budget:tr('question.hotel_budget.short'),
     driving:tr('question.driving.short'),day_start:tr('question.day_start.short'),day_end:tr('question.day_end.short'),mobility:tr('question.mobility.short'),taxi:tr('question.taxi.short'),
     food_budget:tr('question.food_budget.short'),food_rules:tr('question.food_rules.short'),
     interests:tr('question.interests.short'),hard_rules:tr('question.hard_rules.short'),review:tr('question.review.short')
@@ -408,6 +413,15 @@ function renderMust(){
   return `<div class="options">${names.map(n=>ChoiceCard(placeLabel(n),'',P.places.must.includes(n),n,true)).join('')}
   ${ChoiceCard(tr('question.must.none_you_can_choose_based_on_the_route'),'',none,'__none__',true)}</div>`;
 }
+function renderLodgingPlan(){
+  const v=P.hotel.plan;
+  return `<div class="options">
+    ${ChoiceCard(tr('question.lodging_plan.area_only'),tr('question.lodging_plan.area_only_help'),v==='area_only','area_only')}
+    ${ChoiceCard(tr('question.lodging_plan.shortlist'),tr('question.lodging_plan.shortlist_help'),v==='shortlist','shortlist')}
+    ${ChoiceCard(tr('question.lodging_plan.later'),tr('question.lodging_plan.later_help'),v==='later','later')}
+  </div>
+  <div class="infoLine">${esc(tr('question.lodging_plan.no_booking_note'))}</div>`;
+}
 function stayOptions(){
   const n=Number(P.party.size||1);
   if(n<=1)return [[tr('value.single'),'single'],[tr('value.flex'),'flex']];
@@ -591,6 +605,7 @@ function content(id){
   if(id==='travel_bounds')return renderTravelBounds();
   if(id==='places')return renderPlaces();
   if(id==='must_places')return renderMust();
+  if(id==='lodging_plan')return renderLodgingPlan();
   if(id==='stay_style')return renderStayStyle();
   if(id==='hotel_budget')return renderHotelBudget();
   if(id==='driving')return renderDriving();
@@ -632,6 +647,7 @@ function pageIssues(id){
   }
   if(id==='places'&&selectedPlaceNames().length===0)add(tr('validation.add_the_places_you_want_to_visit'));
   if(id==='must_places'&&(!P.answered.must_places||P.places.must.some(n=>!selectedPlaceNames().includes(n))))add(tr('validation.confirm_your_must_visits_from_your_current_wanted'));
+  if(id==='lodging_plan'&&!['area_only','shortlist','later'].includes(P.hotel.plan))add(tr('validation.choose_lodging_plan'));
   if(id==='stay_style'&&!stayOptions().some(([,v])=>v===P.hotel.stay_style))add(tr('validation.choose_a_room_arrangement_for_your_group'));
   if(id==='hotel_budget'&&!P.hotel.budget_per_room)add(tr('validation.choose_your_hotel_budget_per_room_per_night'));
   if(id==='driving'&&!P.driving.mode)add(tr('validation.confirm_whether_you_will_drive_or_rent_a'));
@@ -713,7 +729,7 @@ function wire(id){
       if(!P.trip.start_date||P.trip.end_date){P.trip.start_date=d;P.trip.end_date='';}
       else{
         if(d<P.trip.start_date){P.trip.end_date=P.trip.start_date;P.trip.start_date=d}else P.trip.end_date=d;
-        if(isDayTrip()){P.hotel.coverage='none';P.hotel.stay_style='';P.hotel.budget_per_room='';}
+        if(isDayTrip()){P.hotel.coverage='none';P.hotel.plan='';P.hotel.stay_style='';P.hotel.budget_per_room='';}
       }
       save();
       if(P.trip.end_date)autoNext();else render();
@@ -748,8 +764,14 @@ function wire(id){
       const x=b.dataset.value;P.answered.known=true;
       if(x==='none'){
         P.known={hotel:false,inbound:false,outbound:false,user_places:false,fixed_event:false};
+        P.hotel.coverage='none';
+        P.hotel.plan='';
       }else{
         P.known[x]=!P.known[x];
+        if(x==='hotel'){
+          if(P.known.hotel){P.hotel.plan='';}
+          else{P.hotel.coverage='none';P.hotel.manual_note='';}
+        }
       }
       save();render();
     });
@@ -773,7 +795,11 @@ function wire(id){
       if(cat==='event')P.event.manual_note=e.target.value;
       save();updateNext();
     });
-    document.querySelectorAll('[data-coverage]').forEach(b=>b.onclick=()=>{P.hotel.coverage=b.dataset.coverage;save();render()});
+    document.querySelectorAll('[data-coverage]').forEach(b=>b.onclick=()=>{
+      P.hotel.coverage=b.dataset.coverage;
+      if(P.hotel.coverage==='all')P.hotel.plan='';
+      save();render();
+    });
   }
   if(id==='travel_bounds'){
     document.querySelectorAll('[data-first-window]').forEach(b=>b.onclick=()=>{P.trip.first_day_window=b.dataset.firstWindow;save();render()});
@@ -791,6 +817,18 @@ function wire(id){
       if(x==='__none__')P.places.must=[];
       else P.places.must=P.places.must.includes(x)?P.places.must.filter(v=>v!==x):[...P.places.must,x];
       save();render();
+    });
+  }
+  if(id==='lodging_plan'){
+    document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{
+      P.hotel.plan=b.dataset.value;
+      if(P.hotel.plan!=='shortlist'){
+        P.hotel.stay_style='';
+        P.hotel.budget_per_room='';
+        P.hotel.prefs=[];
+        P.hotel.pref_other='';
+      }
+      save();autoNext();
     });
   }
   if(id==='stay_style'){
@@ -944,6 +982,9 @@ function reviewData(){
     P.event.window?tr('value.'+P.event.window):''
   ],P.event.manual_note)));
   if(P.known.user_places){bookings.push(row('wanted',selectedPlaceNames().map(placeLabel).join(' / ')||tr('common.unfilled')));bookings.push(row('must',P.answered.must_places?(P.places.must.length?P.places.must.map(placeLabel).join(' / '):tr('places.none')):tr('common.unfilled')))}
+  if(needsLodgingPlan()&&P.hotel.plan){
+    bookings.push(row('lodging_plan',tr('lodging.plan.'+P.hotel.plan)));
+  }
   const lodging=[row('rooms',valLabel(P.hotel.stay_style)),row('hotel_budget',valLabel(P.hotel.budget_per_room)),row('hotel_prefs',P.hotel.prefs.length?list(P.hotel.prefs,'hotel'):tr('common.unspecified'))];
   if(P.hotel.pref_other&&P.hotel.prefs.includes('other'))lodging.push(row('note',P.hotel.pref_other));
   const transport=[row('driving',valLabel(P.driving.mode)),row('usual_start',custom(P.schedule.usual_start)),row('earliest',custom(P.schedule.earliest_start)),row('usual_return',custom(P.schedule.usual_return)),row('latest',P.schedule.latest_return==='open'?tr('common.unlimited'):custom(P.schedule.latest_return)),row('usual_steps',valLabel(P.mobility.usual_steps)),row('max_steps',P.mobility.hard_steps?tr('unit.steps',{n:P.mobility.hard_steps}):tr('common.unfilled')),row('stairs',valLabel(P.mobility.stairs))];
@@ -952,7 +993,7 @@ function reviewData(){
   if(P.food.dietary.includes('other')&&P.food.dietary_other)food.push(row('note',P.food.dietary_other));
   const preferences=Object.keys(INTEREST_KEYS).map(k=>[interestName(k),P.interests[k]?tr('unit.stars',{n:P.interests[k]}):tr('common.unfilled')]);
   preferences.push(row('rules',list(P.hard_rules,'rule')));if(P.note)preferences.push(row('note',P.note));
-  return [{title:tr('nav.basic'),edit:'origin',rows:basic},{title:tr('nav.bookings'),edit:'known',rows:bookings},...(needLodging()?[{title:tr('nav.lodging'),edit:'stay_style',rows:lodging}]:[]),{title:tr('nav.transport'),edit:'driving',rows:transport},{title:tr('nav.food'),edit:'food_budget',rows:food},{title:tr('nav.preferences'),edit:'interests',rows:preferences}];
+  return [{title:tr('nav.basic'),edit:'origin',rows:basic},{title:tr('nav.bookings'),edit:'known',rows:bookings},...(needsHotelShortlist()?[{title:tr('nav.lodging'),edit:'stay_style',rows:lodging}]:[]),{title:tr('nav.transport'),edit:'driving',rows:transport},{title:tr('nav.food'),edit:'food_budget',rows:food},{title:tr('nav.preferences'),edit:'interests',rows:preferences}];
 }
 function renderReview(){
   const issues=validate();
