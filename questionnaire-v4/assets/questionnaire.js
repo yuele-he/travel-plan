@@ -902,28 +902,18 @@ async function buildZip(){
 }
 let successVisible=false;
 
-async function submitOrderToCloud(){
-  if(!window.TravelCloudBase?.createOrder)throw new Error('cloudbase_client_unavailable');
-  const questionnaire=JSON.parse(JSON.stringify(P));
-  questionnaire.locale=locale;
-  questionnaire.submitted=true;
-  questionnaire.exported_at=new Date().toISOString();
-
-  const request=window.TravelCloudBase.createOrder({
-    schema_version:'questionnaire-v4',
-    locale,
-    questionnaire
-  });
-  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('cloud_submit_timeout')),8000));
-  return await Promise.race([request,timeout]);
-}
-
-function wireBackupActions(text){
+function wireManualDeliveryActions(text){
   const makeFile=async()=>new File(
     [await buildZip()],
     `${tr('success.chongqing_trip')}${P.order_id.slice(0,8)}.zip`,
     {type:'application/zip'}
   );
+
+  const copy=document.getElementById('copyText');
+  if(copy)copy.onclick=async()=>{
+    await navigator.clipboard.writeText(text);
+    toast(tr('success.copied'));
+  };
 
   const download=document.getElementById('downloadPack');
   if(download)download.onclick=async()=>{
@@ -948,12 +938,6 @@ function wireBackupActions(text){
     setTimeout(()=>URL.revokeObjectURL(u),3000);
     toast(tr('success.file_sharing_is_not_supported_here_downloading_instead'));
   };
-
-  const copy=document.getElementById('copyText');
-  if(copy)copy.onclick=async()=>{
-    await navigator.clipboard.writeText(text);
-    toast(tr('success.copied'));
-  };
 }
 
 async function finish(){
@@ -964,69 +948,28 @@ async function finish(){
   bottom.style.display='none';
 
   card.innerHTML=`<div class="successState">
-    <div class="doneMark">…</div>
-    <h2>${esc(tr('success.submitting'))}</h2>
+    <div class="doneMark">✓</div>
+    <h2>${esc(tr('success.manual_title'))}</h2>
+    <p class="doneText">${esc(tr('success.manual_body'))}</p>
+
+    <button class="primary" id="copyText">${esc(tr('success.manual_copy'))}</button>
+
+    <div class="issue">
+      <b>${esc(tr('success.manual_images_title'))}</b>
+      <div class="tiny" style="margin-top:6px">${esc(tr('success.manual_images_body'))}</div>
+    </div>
+
+    <details class="disclosure">
+      <summary>${esc(tr('success.view_trip_details'))}</summary>
+      <div class="resultBox">${esc(text)}</div>
+    </details>
+
+    <div class="tiny" style="margin-top:14px">${esc(tr('success.manual_backup_note'))}</div>
+    <button class="secondary" id="downloadPack">${esc(tr('success.download_trip_details'))}</button>
+    <button class="secondary" id="sharePack">${esc(tr('success.share_trip_details'))}</button>
   </div>`;
 
-  try{
-    const order=await submitOrderToCloud();
-    try{
-      localStorage.setItem(
-        STORAGE+'-server-order',
-        JSON.stringify({
-          order_id:order.order_id,
-          guide_url:order.guide_url,
-          submitted_at:new Date().toISOString()
-        })
-      );
-    }catch(e){}
-
-    card.innerHTML=`<div class="successState">
-      <div class="doneMark">✓</div>
-      <h2>${esc(tr('success.submitted_title'))}</h2>
-      <p class="doneText">${esc(tr('success.submitted_body'))}</p>
-      <div class="issue green"><b>${esc(tr('success.order_id'))}：</b>${esc(order.order_id)}</div>
-      ${order.guide_url?`
-        <div class="resultBox">
-          <b>${esc(tr('success.guide_link'))}</b>
-          <div class="tiny" style="margin-top:6px">${esc(tr('success.guide_link_note'))}</div>
-          <div style="margin-top:10px">
-            <a class="primary" href="${esc(order.guide_url)}" target="_blank" rel="noopener noreferrer">${esc(tr('success.guide_link'))}</a>
-          </div>
-          <button class="secondary" id="copyGuideLink">${esc(tr('success.copy_guide_link'))}</button>
-        </div>`:''}
-      <details class="disclosure">
-        <summary>${esc(tr('success.view_trip_details'))}</summary>
-        <div class="resultBox">${esc(text)}</div>
-      </details>
-      <button class="secondary" id="downloadPack">${esc(tr('success.backup_download'))}</button>
-      <button class="secondary" id="sharePack">${esc(tr('success.backup_share'))}</button>
-      <button class="secondary" id="copyText">${esc(tr('success.copy_text'))}</button>
-    </div>`;
-
-    if(order.guide_url){
-      document.getElementById('copyGuideLink')?.addEventListener('click',async()=>{
-        await navigator.clipboard.writeText(order.guide_url);
-        toast(tr('success.guide_link_copied'));
-      });
-    }
-    wireBackupActions(text);
-  }catch(error){
-    console.warn('CloudBase direct submission unavailable; falling back to local package.',error);
-    card.innerHTML=`<div class="successState">
-      <div class="doneMark">!</div>
-      <h2>${esc(tr('success.cloud_fallback_title'))}</h2>
-      <p class="doneText">${esc(tr('success.cloud_fallback_body'))}</p>
-      <button class="primary" id="sharePack">${esc(tr('success.backup_share'))}</button>
-      <button class="secondary" id="downloadPack">${esc(tr('success.backup_download'))}</button>
-      <button class="secondary" id="copyText">${esc(tr('success.copy_text'))}</button>
-      <details class="disclosure">
-        <summary>${esc(tr('success.view_trip_details'))}</summary>
-        <div class="resultBox">${esc(text)}</div>
-      </details>
-    </div>`;
-    wireBackupActions(text);
-  }
+  wireManualDeliveryActions(text);
 }
 
 // IndexedDB attachment store
