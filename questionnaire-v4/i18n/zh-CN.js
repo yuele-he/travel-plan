@@ -522,4 +522,6 @@ I18N['zh-CN']={
   "lodging.plan.area_only": "先推荐住宿区域，我自己选酒店",
   "lodging.plan.shortlist": "给几个酒店候选，我自己下单",
   "lodging.plan.later": "我自己先订，之后再发酒店",
+  "booking.mode.other": "其他",
+  "booking.event.other": "其他",
 };
