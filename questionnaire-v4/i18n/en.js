@@ -522,4 +522,6 @@ I18N['en']={
   "lodging.plan.area_only": "Suggest an area; I’ll choose the hotel",
   "lodging.plan.shortlist": "Suggest a few hotels; I’ll book them myself",
   "lodging.plan.later": "I’ll book it myself and send the hotel later",
+  "booking.mode.other": "Other",
+  "booking.event.other": "Other",
 };
