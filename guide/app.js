@@ -17,6 +17,13 @@
   async function loadViewModel() {
     const token = accessTokenFromHash();
 
+    if (token && CONFIG.cloudbaseEnvId) {
+      if (!window.TravelGuideCloudBase?.getFinalGuide) {
+        throw new Error("cloudbase_guide_client_unavailable");
+      }
+      return await window.TravelGuideCloudBase.getFinalGuide(token);
+    }
+
     if (token && CONFIG.apiBase) {
       const res = await fetch(`${CONFIG.apiBase.replace(/\/$/, "")}/v1/final-guide`, {
         headers: {
@@ -27,6 +34,10 @@
       });
       if (!res.ok) throw new Error(`guide_api_${res.status}`);
       return await res.json();
+    }
+
+    if (token) {
+      throw new Error("guide_backend_not_configured");
     }
 
     const res = await fetch(CONFIG.demoUrl || "./demo.json", { cache: "no-store" });
