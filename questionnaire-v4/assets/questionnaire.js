@@ -184,13 +184,20 @@ function stageState(g){
   if(n>0)return'partial';
   return'';
 }
+function centerNavItemHorizontally(item){
+  if(!item)return;
+  const scroller=item.parentElement;
+  if(!scroller)return;
+  const left=item.offsetLeft-(scroller.clientWidth-item.offsetWidth)/2;
+  scroller.scrollLeft=Math.max(0,left);
+}
 function renderStageNav(){
   const groups=stageGroups(),current=steps().find(x=>x.id===currentId)?.stage;
   stageNav.innerHTML=groups.map(g=>`<button class="stageJump ${g.stage===current?'current':stageState(g)}" aria-current="${g.stage===current?'step':'false'}" data-stage="${esc(g.stage)}">${esc(tr('nav.'+g.stage))}</button>`).join('');
   stageNav.querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>{
     const g=groups.find(x=>x.stage===b.dataset.stage);if(g)go(g.ids[0]);
   });
-  stageNav.querySelector('.stageJump.current')?.scrollIntoView({behavior:'instant',block:'nearest',inline:'center'});
+  centerNavItemHorizontally(stageNav.querySelector('.stageJump.current'));
 }
 function renderQuestionNav(){
   const S=steps(),current=S.find(x=>x.id===currentId),groups=stageGroups();
@@ -206,7 +213,7 @@ function renderQuestionNav(){
   }).join('');
   questionNav.innerHTML=`<div class="qitemsWrap">${items}</div>`;
   questionNav.querySelectorAll('[data-qid]').forEach(b=>b.onclick=()=>go(b.dataset.qid));
-  questionNav.querySelector('.qjump.current')?.scrollIntoView({behavior:'instant',block:'nearest',inline:'center'});
+  centerNavItemHorizontally(questionNav.querySelector('.qjump.current'));
 }
 function go(id){
   currentId=id;save();render();window.scrollTo({top:0,behavior:'instant'});card.querySelector('h1')?.focus({preventScroll:true});
