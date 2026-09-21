@@ -1,4 +1,5 @@
 const STORAGE='cq-trip-web-v4-draft';
+const COMPANION_URL='https://yuele-he.github.io/travel-plan/companion/';
 const DB='cq-trip-attachments-v4', STORE='files';
 
 const HOT=['shanghai','beijing','guangzhou','shenzhen','hong_kong','macao','chengdu','hangzhou','wuhan','xian','changsha','nanjing','zhengzhou','kunming'];
@@ -1002,6 +1003,12 @@ function wireManualDeliveryActions(text){
     toast(ok?tr('success.copied'):tr('success.copy_failed'));
   };
 
+  const companion=document.getElementById('copyCompanionLink');
+  if(companion)companion.onclick=async()=>{
+    const ok=await copyPlainText(COMPANION_URL);
+    toast(ok?tr('success.companion_copied'):tr('success.copy_failed'));
+  };
+
   const download=document.getElementById('downloadPack');
   if(download)download.onclick=async()=>{
     toast(tr('success.preparing_your_file'));
@@ -1045,6 +1052,12 @@ async function finish(){
       <b>${esc(tr('success.manual_images_title'))}</b>
       <div class="tiny" style="margin-top:6px">${esc(tr('success.manual_images_body'))}</div>
     </div>
+
+    ${Number(P.party.size)>1?`<div class="issue">
+      <b>${esc(tr('success.companion_title'))}</b>
+      <div class="tiny" style="margin-top:6px">${esc(tr('success.companion_body'))}</div>
+      <button class="secondary" id="copyCompanionLink">${esc(tr('success.companion_copy'))}</button>
+    </div>`:''}
 
     <details class="disclosure">
       <summary>${esc(tr('success.view_trip_details'))}</summary>
