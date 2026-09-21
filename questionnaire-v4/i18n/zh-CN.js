@@ -524,4 +524,8 @@ I18N['zh-CN']={
   "lodging.plan.later": "我自己先订，之后再发酒店",
   "booking.mode.other": "其他",
   "booking.event.other": "其他",
+  "success.companion_title": "同行的人也可以说说自己的想法",
+  "success.companion_body": "把这个 1 分钟小问卷发给他们。只问个人偏好和硬限制，不会重复日期、酒店、交通。",
+  "success.companion_copy": "复制同行人小问卷链接",
+  "success.companion_copied": "同行人小问卷链接已复制",
 };

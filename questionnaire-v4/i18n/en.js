@@ -524,4 +524,8 @@ I18N['en']={
   "lodging.plan.later": "I’ll book it myself and send the hotel later",
   "booking.mode.other": "Other",
   "booking.event.other": "Other",
+  "success.companion_title": "Your travel companions can add their own preferences",
+  "success.companion_body": "Send them this 1-minute mini survey. It only asks about personal preferences and hard constraints, without repeating dates, hotels, or transport.",
+  "success.companion_copy": "Copy companion survey link",
+  "success.companion_copied": "Companion survey link copied",
 };
