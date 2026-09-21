@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#faf9f6">
+  <title>同行人小问卷</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <div class="brand">一起把这趟旅行调舒服</div>
+        <div class="sub" id="headerSub">同行人小问卷 · 约 1 分钟</div>
+      </div>
+      <nav class="langs" aria-label="Language">
+        <button data-locale="zh-CN">简</button>
+        <button data-locale="zh-TW">繁</button>
+        <button data-locale="en">EN</button>
+      </nav>
+    </header>
+
+    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+    <section id="card" class="card"></section>
+
+    <footer id="bottom" class="bottom">
+      <button class="secondary" id="back">上一步</button>
+      <button class="primary" id="next">下一步</button>
+    </footer>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
