@@ -370,7 +370,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.known.travel_to_chongqing'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.transport_type'),'inbound_mode',P.transport.inbound_mode,transportModes)}
       ${bookingChoiceGroup(tr('question.materials.arrival_window'),'inbound_window',P.transport.inbound_window,windows)}
-      ${bookingDetails('inbound',P.transport.inbound_detail_mode,P.transport.inbound_manual,tr('question.materials.transport_detail_label'),tr('question.materials.transport_optional_note'))}
+      ${bookingDetails('inbound',P.transport.inbound_detail_mode,P.transport.inbound_manual,tr('question.materials.inbound_detail_label'),tr('question.materials.inbound_detail_placeholder'))}
     </div>`;
   }
 
@@ -379,7 +379,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.known.travel_from_chongqing'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.transport_type'),'outbound_mode',P.transport.outbound_mode,transportModes)}
       ${bookingChoiceGroup(tr('question.materials.departure_window'),'outbound_window',P.transport.outbound_window,windows)}
-      ${bookingDetails('outbound',P.transport.outbound_detail_mode,P.transport.outbound_manual,tr('question.materials.transport_detail_label'),tr('question.materials.transport_optional_note'))}
+      ${bookingDetails('outbound',P.transport.outbound_detail_mode,P.transport.outbound_manual,tr('question.materials.outbound_detail_label'),tr('question.materials.outbound_detail_placeholder'))}
     </div>`;
   }
 
@@ -388,7 +388,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.materials.fixed_plans_reservations'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.event_type'),'event_type',P.event.type,eventTypes)}
       ${bookingChoiceGroup(tr('question.materials.event_window'),'event_window',P.event.window,windows)}
-      ${bookingDetails('event',P.event.detail_mode,P.event.manual_note,tr('question.materials.event_detail_label'),tr('question.materials.event_optional_note'))}
+      ${bookingDetails('event',P.event.detail_mode,P.event.manual_note,tr('question.materials.event_detail_label'),tr('question.materials.event_detail_placeholder'))}
     </div>`;
   }
   return out;
@@ -636,12 +636,20 @@ function pageIssues(id){
   if(id==='known'&&!P.answered.known)add(tr('validation.confirm_what_you_have_already_booked_or_decided'));
   if(id==='materials'){
     if(P.known.hotel&&!isDayTrip()&&!['all','partial'].includes(P.hotel.coverage))add(tr('validation.confirm_whether_your_hotel_bookings_cover_all_nights'));
+    if(P.known.hotel&&!isDayTrip()&&!['screenshot','manual'].includes(P.hotel.detail_mode))add(tr('validation.choose_hotel_detail_handoff'));
+    if(P.known.hotel&&!isDayTrip()&&P.hotel.detail_mode==='manual'&&!P.hotel.manual_note.trim())add(tr('validation.enter_hotel_details'));
     if(P.known.inbound&&!P.transport.inbound_mode)add(tr('validation.choose_inbound_transport_type'));
     if(P.known.inbound&&!P.transport.inbound_window)add(tr('validation.choose_inbound_arrival_window'));
+    if(P.known.inbound&&!['screenshot','manual'].includes(P.transport.inbound_detail_mode))add(tr('validation.choose_inbound_detail_handoff'));
+    if(P.known.inbound&&P.transport.inbound_detail_mode==='manual'&&!P.transport.inbound_manual.trim())add(tr('validation.enter_inbound_details'));
     if(P.known.outbound&&!P.transport.outbound_mode)add(tr('validation.choose_outbound_transport_type'));
     if(P.known.outbound&&!P.transport.outbound_window)add(tr('validation.choose_outbound_departure_window'));
+    if(P.known.outbound&&!['screenshot','manual'].includes(P.transport.outbound_detail_mode))add(tr('validation.choose_outbound_detail_handoff'));
+    if(P.known.outbound&&P.transport.outbound_detail_mode==='manual'&&!P.transport.outbound_manual.trim())add(tr('validation.enter_outbound_details'));
     if(P.known.fixed_event&&!P.event.type)add(tr('validation.choose_event_type'));
     if(P.known.fixed_event&&!P.event.window)add(tr('validation.choose_event_window'));
+    if(P.known.fixed_event&&!['screenshot','manual'].includes(P.event.detail_mode))add(tr('validation.choose_event_detail_handoff'));
+    if(P.known.fixed_event&&P.event.detail_mode==='manual'&&!P.event.manual_note.trim())add(tr('validation.enter_event_details'));
   }
   if(id==='travel_bounds'){
     if(!P.known.inbound&&!P.trip.first_day_window)add(tr('validation.choose_when_you_can_start_on_the_first'));
