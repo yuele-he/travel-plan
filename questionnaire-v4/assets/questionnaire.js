@@ -45,6 +45,7 @@ function load(){
     if(x?.schema_version==='chongqing_trip_order_v4'){
       const d=migrateDraft(x);
       d.hotel={coverage:'none',plan:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
+      if(d.hotel.plan==='shortlist')d.hotel.plan='area_only';
       if(!d.hotel.budget_total_per_night&&d.hotel.budget_per_room)d.hotel.budget_total_per_night=d.hotel.budget_per_room;
       d.transport={inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:'',...(d.transport||{})};
       d.event={type:'',window:'',manual_note:'',...(d.event||{})};
@@ -113,7 +114,6 @@ async function copyPlainText(text){
 function allCities(){const s=new Set(HOT);Object.values(CITY_GROUPS).forEach(a=>a.forEach(c=>s.add(c)));return [...s]}
 function isDayTrip(){return !!P.trip.start_date&&P.trip.start_date===P.trip.end_date}
 function needsLodgingPlan(){return !isDayTrip() && (!P.known.hotel || P.hotel.coverage==='partial')}
-function needsHotelShortlist(){return needsLodgingPlan() && P.hotel.plan==='shortlist'}
 function hasBookedMaterials(){return (P.known.hotel&&!isDayTrip())||P.known.inbound||P.known.outbound||P.known.fixed_event}
 function needsTravelBounds(){return !P.known.inbound||!P.known.outbound}
 function fullTimeDriving(){return ['self','rental'].includes(P.driving.mode)}
@@ -134,10 +134,6 @@ function steps(){
   }
   if(needsLodgingPlan()){
     S.push({id:'lodging_plan',stage:'lodging',title:tr('question.lodging_plan.title'),help:tr('question.lodging_plan.help')});
-  }
-  if(needsHotelShortlist()){
-    S.push({id:'stay_style',stage:'lodging',title:tr('question.stay_style.title')});
-    S.push({id:'hotel_budget',stage:'lodging',title:tr('question.hotel_budget.title')});
   }
   S.push(
     {id:'driving',stage:'transport',title:tr('question.driving.title')},
@@ -418,7 +414,6 @@ function renderLodgingPlan(){
   const v=P.hotel.plan;
   return `<div class="options">
     ${ChoiceCard(tr('question.lodging_plan.area_only'),tr('question.lodging_plan.area_only_help'),v==='area_only','area_only')}
-    ${ChoiceCard(tr('question.lodging_plan.shortlist'),tr('question.lodging_plan.shortlist_help'),v==='shortlist','shortlist')}
     ${ChoiceCard(tr('question.lodging_plan.later'),tr('question.lodging_plan.later_help'),v==='later','later')}
   </div>
   <div class="infoLine">${esc(tr('question.lodging_plan.no_booking_note'))}</div>`;
@@ -607,8 +602,6 @@ function content(id){
   if(id==='places')return renderPlaces();
   if(id==='must_places')return renderMust();
   if(id==='lodging_plan')return renderLodgingPlan();
-  if(id==='stay_style')return renderStayStyle();
-  if(id==='hotel_budget')return renderHotelBudget();
   if(id==='driving')return renderDriving();
   if(id==='day_start')return renderDayStart();
   if(id==='day_end')return renderDayEnd();
@@ -648,9 +641,7 @@ function pageIssues(id){
   }
   if(id==='places'&&selectedPlaceNames().length===0)add(tr('validation.add_the_places_you_want_to_visit'));
   if(id==='must_places'&&(!P.answered.must_places||P.places.must.some(n=>!selectedPlaceNames().includes(n))))add(tr('validation.confirm_your_must_visits_from_your_current_wanted'));
-  if(id==='lodging_plan'&&!['area_only','shortlist','later'].includes(P.hotel.plan))add(tr('validation.choose_lodging_plan'));
-  if(id==='stay_style'&&!stayOptions().some(([,v])=>v===P.hotel.stay_style))add(tr('validation.choose_a_room_arrangement_for_your_group'));
-  if(id==='hotel_budget'&&!P.hotel.budget_total_per_night)add(tr('validation.choose_your_hotel_budget_per_room_per_night'));
+  if(id==='lodging_plan'&&!['area_only','later'].includes(P.hotel.plan))add(tr('validation.choose_lodging_plan'));
   if(id==='driving'&&!P.driving.mode)add(tr('validation.confirm_whether_you_will_drive_or_rent_a'));
   if(id==='day_start'){
     if(!P.schedule.usual_start)add(tr('validation.choose_your_usual_start_time'));
@@ -823,31 +814,12 @@ function wire(id){
   if(id==='lodging_plan'){
     document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{
       P.hotel.plan=b.dataset.value;
-      if(P.hotel.plan!=='shortlist'){
-        P.hotel.stay_style='';
-        P.hotel.budget_total_per_night='';
-        P.hotel.prefs=[];
-        P.hotel.pref_other='';
-      }
+      P.hotel.stay_style='';
+      P.hotel.budget_total_per_night='';
+      P.hotel.prefs=[];
+      P.hotel.pref_other='';
       save();autoNext();
     });
-  }
-  if(id==='stay_style'){
-    document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{P.hotel.stay_style=b.dataset.value;save();autoNext()});
-  }
-  if(id==='hotel_budget'){
-    document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{P.hotel.budget_total_per_night=b.dataset.value;save();render()});
-    document.querySelectorAll('[data-hotel-pref]').forEach(b=>b.onclick=()=>{
-      const x=b.dataset.hotelPref;
-      if(x==='none')P.hotel.prefs=['none'];
-      else{
-        P.hotel.prefs=P.hotel.prefs.filter(v=>v!=='none');
-        P.hotel.prefs=P.hotel.prefs.includes(x)?P.hotel.prefs.filter(v=>v!==x):[...P.hotel.prefs,x];
-      }
-      if(!P.hotel.prefs.includes('other'))P.hotel.pref_other='';
-      save();render();
-    });
-    document.getElementById('hotelPrefOther')?.addEventListener('input',e=>{P.hotel.pref_other=e.target.value;save()});
   }
   if(id==='driving'){
     document.querySelectorAll('[data-value]').forEach(b=>b.onclick=()=>{
@@ -986,15 +958,14 @@ function reviewData(){
   if(needsLodgingPlan()&&P.hotel.plan){
     bookings.push(row('lodging_plan',tr('lodging.plan.'+P.hotel.plan)));
   }
-  const lodging=[row('rooms',valLabel(P.hotel.stay_style)),row('hotel_budget',valLabel(P.hotel.budget_total_per_night)),row('hotel_prefs',P.hotel.prefs.length?list(P.hotel.prefs,'hotel'):tr('common.unspecified'))];
-  if(P.hotel.pref_other&&P.hotel.prefs.includes('other'))lodging.push(row('note',P.hotel.pref_other));
+  const lodging=[];
   const transport=[row('driving',valLabel(P.driving.mode)),row('usual_start',custom(P.schedule.usual_start)),row('earliest',custom(P.schedule.earliest_start)),row('usual_return',custom(P.schedule.usual_return)),row('latest',P.schedule.latest_return==='open'?tr('common.unlimited'):custom(P.schedule.latest_return)),row('usual_steps',valLabel(P.mobility.usual_steps)),row('max_steps',P.mobility.hard_steps?tr('unit.steps',{n:P.mobility.hard_steps}):tr('common.unfilled')),row('stairs',valLabel(P.mobility.stairs))];
   if(!fullTimeDriving())transport.push(row('taxi',P.local_transport.taxi_cap==='open'?tr('common.unlimited'):P.local_transport.taxi_cap===undefined?tr('common.unfilled'):'¥'+P.local_transport.taxi_cap));
   const food=[row('meal',valLabel(P.food.meal_budget)+tr('unit.per_person')),row('max_meal',P.food.meal_max==='open'?tr('common.unlimited'):P.food.meal_max===undefined?tr('common.unfilled'):'¥'+P.food.meal_max+tr('unit.per_person')),row('queue',P.food.queue==='open'?tr('queue.open'):P.food.queue===''?tr('common.unfilled'):tr('unit.minutes',{n:P.food.queue})),row('diet',list(P.food.dietary,'diet')),row('smoking',valLabel(P.food.smoke_rule))];
   if(P.food.dietary.includes('other')&&P.food.dietary_other)food.push(row('note',P.food.dietary_other));
   const preferences=Object.keys(INTEREST_KEYS).map(k=>[interestName(k),P.interests[k]?tr('unit.stars',{n:P.interests[k]}):tr('common.unfilled')]);
   preferences.push(row('rules',list(P.hard_rules,'rule')));if(P.note)preferences.push(row('note',P.note));
-  return [{title:tr('nav.basic'),edit:'origin',rows:basic},{title:tr('nav.bookings'),edit:'known',rows:bookings},...(needsHotelShortlist()?[{title:tr('nav.lodging'),edit:'stay_style',rows:lodging}]:[]),{title:tr('nav.transport'),edit:'driving',rows:transport},{title:tr('nav.food'),edit:'food_budget',rows:food},{title:tr('nav.preferences'),edit:'interests',rows:preferences}];
+  return [{title:tr('nav.basic'),edit:'origin',rows:basic},{title:tr('nav.bookings'),edit:'known',rows:bookings},{title:tr('nav.transport'),edit:'driving',rows:transport},{title:tr('nav.food'),edit:'food_budget',rows:food},{title:tr('nav.preferences'),edit:'interests',rows:preferences}];
 }
 function renderReview(){
   const issues=validate();
