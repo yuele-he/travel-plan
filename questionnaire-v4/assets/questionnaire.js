@@ -24,9 +24,9 @@ function fresh(){
     party:{type:'',size:null,family_members:[],child_ages:''},
     known:{hotel:false,inbound:false,outbound:false,user_places:false,fixed_event:false},
     answered:{known:false,must_places:false,dietary:false,hard_rules:false},
-    hotel:{coverage:'none',plan:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:''},
-    transport:{inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:''},
-    event:{type:'',window:'',manual_note:''},
+    hotel:{coverage:'none',plan:'',detail_mode:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:''},
+    transport:{inbound_mode:'',inbound_window:'',inbound_detail_mode:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_detail_mode:'',outbound_manual:''},
+    event:{type:'',window:'',detail_mode:'',manual_note:''},
     places:{quick:[],pasted:'',must:[]},
     driving:{mode:''},
     schedule:{usual_start:'',earliest_start:'',usual_return:'',latest_return:''},
@@ -45,11 +45,11 @@ function load(){
     const x=JSON.parse(localStorage.getItem(STORAGE));
     if(x?.schema_version==='chongqing_trip_order_v4'){
       const d=migrateDraft(x);
-      d.hotel={coverage:'none',plan:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
+      d.hotel={coverage:'none',plan:'',detail_mode:'',manual_note:'',stay_style:'',budget_total_per_night:'',budget_per_room:'',prefs:[],pref_other:'',...(d.hotel||{})};
       if(d.hotel.plan==='shortlist')d.hotel.plan='area_only';
       if(!d.hotel.budget_total_per_night&&d.hotel.budget_per_room)d.hotel.budget_total_per_night=d.hotel.budget_per_room;
-      d.transport={inbound_mode:'',inbound_window:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_manual:'',...(d.transport||{})};
-      d.event={type:'',window:'',manual_note:'',...(d.event||{})};
+      d.transport={inbound_mode:'',inbound_window:'',inbound_detail_mode:'',inbound_manual:'',outbound_mode:'',outbound_window:'',outbound_detail_mode:'',outbound_manual:'',...(d.transport||{})};
+      d.event={type:'',window:'',detail_mode:'',manual_note:'',...(d.event||{})};
       return d;
     }
   }catch(e){}
@@ -311,10 +311,17 @@ function bookingChoiceGroup(label,key,current,options){
     <div class="inlineChoices">${options.map(([text,value])=>`<button class="inlineChoice ${current===value?'sel':''}" data-booking-key="${esc(key)}" data-booking-value="${esc(value)}">${esc(text)}</button>`).join('')}</div>
   </div>`;
 }
-function bookingNote(cat,value,placeholder){
-  return `<div class="field compactField">
-    <div class="label">${esc(tr('question.materials.optional_note'))}</div>
-    <input class="input" data-manual="${cat}" value="${esc(value||'')}" placeholder="${esc(placeholder)}">
+function bookingDetails(cat,mode,value,label,placeholder){
+  return `<div class="subblock bookingChoiceBlock">
+    <div class="subhead">${esc(tr('question.materials.details_handoff'))}</div>
+    <div class="inlineChoices">
+      <button class="inlineChoice ${mode==='screenshot'?'sel':''}" data-detail-mode="${cat}" data-detail-value="screenshot">${esc(tr('question.materials.send_screenshot_later'))}</button>
+      <button class="inlineChoice ${mode==='manual'?'sel':''}" data-detail-mode="${cat}" data-detail-value="manual">${esc(tr('question.materials.fill_now'))}</button>
+    </div>
+    ${mode==='manual'?`<div class="field compactField">
+      <div class="label">${esc(label)}</div>
+      <input class="input" data-manual="${cat}" value="${esc(value||'')}" placeholder="${esc(placeholder)}">
+    </div>`:''}
   </div>`;
 }
 function renderMaterials(){
@@ -354,7 +361,7 @@ function renderMaterials(){
           <button class="inlineChoice ${P.hotel.coverage==='partial'?'sel':''}" data-coverage="partial">${esc(tr('booking.hotel.partial'))}</button>
         </div>
       </div>
-      ${bookingNote('hotel',P.hotel.manual_note,tr('question.materials.hotel_optional_note'))}
+      ${bookingDetails('hotel',P.hotel.detail_mode,P.hotel.manual_note,tr('question.materials.hotel_detail_label'),tr('question.materials.hotel_optional_note'))}
     </div>`;
   }
 
@@ -363,7 +370,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.known.travel_to_chongqing'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.transport_type'),'inbound_mode',P.transport.inbound_mode,transportModes)}
       ${bookingChoiceGroup(tr('question.materials.arrival_window'),'inbound_window',P.transport.inbound_window,windows)}
-      ${bookingNote('inbound',P.transport.inbound_manual,tr('question.materials.transport_optional_note'))}
+      ${bookingDetails('inbound',P.transport.inbound_detail_mode,P.transport.inbound_manual,tr('question.materials.transport_detail_label'),tr('question.materials.transport_optional_note'))}
     </div>`;
   }
 
@@ -372,7 +379,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.known.travel_from_chongqing'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.transport_type'),'outbound_mode',P.transport.outbound_mode,transportModes)}
       ${bookingChoiceGroup(tr('question.materials.departure_window'),'outbound_window',P.transport.outbound_window,windows)}
-      ${bookingNote('outbound',P.transport.outbound_manual,tr('question.materials.transport_optional_note'))}
+      ${bookingDetails('outbound',P.transport.outbound_detail_mode,P.transport.outbound_manual,tr('question.materials.transport_detail_label'),tr('question.materials.transport_optional_note'))}
     </div>`;
   }
 
@@ -381,7 +388,7 @@ function renderMaterials(){
       <div class="uploadGroupTitle"><b>${esc(tr('question.materials.fixed_plans_reservations'))}</b></div>
       ${bookingChoiceGroup(tr('question.materials.event_type'),'event_type',P.event.type,eventTypes)}
       ${bookingChoiceGroup(tr('question.materials.event_window'),'event_window',P.event.window,windows)}
-      ${bookingNote('event',P.event.manual_note,tr('question.materials.event_optional_note'))}
+      ${bookingDetails('event',P.event.detail_mode,P.event.manual_note,tr('question.materials.event_detail_label'),tr('question.materials.event_optional_note'))}
     </div>`;
   }
   return out;
@@ -763,7 +770,7 @@ function wire(id){
         P.known[x]=!P.known[x];
         if(x==='hotel'){
           if(P.known.hotel){P.hotel.plan='';}
-          else{P.hotel.coverage='none';P.hotel.manual_note='';}
+          else{P.hotel.coverage='none';P.hotel.detail_mode='';P.hotel.manual_note='';}
         }
       }
       save();render();
@@ -778,6 +785,20 @@ function wire(id){
       if(key==='outbound_window')P.transport.outbound_window=value;
       if(key==='event_type')P.event.type=value;
       if(key==='event_window')P.event.window=value;
+      save();render();
+    });
+    document.querySelectorAll('[data-detail-mode]').forEach(b=>b.onclick=()=>{
+      const cat=b.dataset.detailMode,value=b.dataset.detailValue;
+      if(cat==='hotel')P.hotel.detail_mode=value;
+      if(cat==='inbound')P.transport.inbound_detail_mode=value;
+      if(cat==='outbound')P.transport.outbound_detail_mode=value;
+      if(cat==='event')P.event.detail_mode=value;
+      if(value==='screenshot'){
+        if(cat==='hotel')P.hotel.manual_note='';
+        if(cat==='inbound')P.transport.inbound_manual='';
+        if(cat==='outbound')P.transport.outbound_manual='';
+        if(cat==='event')P.event.manual_note='';
+      }
       save();render();
     });
     document.querySelectorAll('[data-manual]').forEach(t=>t.oninput=e=>{
@@ -940,21 +961,21 @@ function reviewData(){
   const bookings=[];
   const bookingText=(parts,note)=>[...parts.filter(Boolean),note].filter(Boolean).join(' · ');
   if(P.known.hotel&&!isDayTrip()){
-    bookings.push(row('hotel',P.hotel.manual_note||tr('booking.hotel.booked')));
+    bookings.push(row('hotel',P.hotel.manual_note||(P.hotel.detail_mode==='screenshot'?tr('booking.detail.screenshot_later'):tr('booking.hotel.booked'))));
     bookings.push(row('coverage',P.hotel.coverage==='all'?tr('booking.hotel.all'):P.hotel.coverage==='partial'?tr('booking.hotel.partial'):tr('common.unfilled')));
   }
   if(P.known.inbound)bookings.push(row('inbound',bookingText([
     P.transport.inbound_mode?tr('booking.mode.'+P.transport.inbound_mode):'',
     P.transport.inbound_window?tr('value.'+P.transport.inbound_window):''
-  ],P.transport.inbound_manual)));else bookings.push(row('first_day',valLabel(P.trip.first_day_window)));
+  ],P.transport.inbound_manual||(P.transport.inbound_detail_mode==='screenshot'?tr('booking.detail.screenshot_later'):''))));else bookings.push(row('first_day',valLabel(P.trip.first_day_window)));
   if(P.known.outbound)bookings.push(row('outbound',bookingText([
     P.transport.outbound_mode?tr('booking.mode.'+P.transport.outbound_mode):'',
     P.transport.outbound_window?tr('value.'+P.transport.outbound_window):''
-  ],P.transport.outbound_manual)));else bookings.push(row('last_day',valLabel(P.trip.last_day_window)));
+  ],P.transport.outbound_manual||(P.transport.outbound_detail_mode==='screenshot'?tr('booking.detail.screenshot_later'):''))));else bookings.push(row('last_day',valLabel(P.trip.last_day_window)));
   if(P.known.fixed_event)bookings.push(row('event',bookingText([
     P.event.type?tr('booking.event.'+P.event.type):'',
     P.event.window?tr('value.'+P.event.window):''
-  ],P.event.manual_note)));
+  ],P.event.manual_note||(P.event.detail_mode==='screenshot'?tr('booking.detail.screenshot_later'):''))));
   if(P.known.user_places){bookings.push(row('wanted',selectedPlaceNames().map(placeLabel).join(' / ')||tr('common.unfilled')));bookings.push(row('must',P.answered.must_places?(P.places.must.length?P.places.must.map(placeLabel).join(' / '):tr('places.none')):tr('common.unfilled')))}
   if(needsLodgingPlan()&&P.hotel.plan){
     bookings.push(row('lodging_plan',tr('lodging.plan.'+P.hotel.plan)));
