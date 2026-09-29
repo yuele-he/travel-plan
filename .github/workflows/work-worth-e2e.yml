@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=3'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=4'; then
               ok=1
               break
             fi
