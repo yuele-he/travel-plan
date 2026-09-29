@@ -48,7 +48,7 @@ h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacin
 <h1>这份工作，<br>还值得再待一年吗？</h1>
 <p class="lead">不只看工资。我们会把你的<strong>当前回报、未来增值、可持续性和离开能力</strong>拆开看，再结合你真正想改善的事情、值得等的节点和现实风险。</p>
 <div class="feature-grid">
-<div class="feature"><b>约 6–9 分钟</b><span>按收入和工作类型自动换题</span></div>
+<div class="feature"><b>约 7–10 分钟</b><span>按收入和工作类型自动换题</span></div>
 <div class="feature"><b>4 个维度</b><span>不压成一个笼统总分</span></div>
 <div class="feature"><b>16 种阶段</b><span>给判断依据，不替你做决定</span></div>
 </div>
@@ -81,7 +81,7 @@ var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#
 var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
 var autoAdvanceTimer=null;
 function cancelAutoAdvance(){if(autoAdvanceTimer){clearTimeout(autoAdvanceTimer);autoAdvanceTimer=null;}}
-var STORAGE="workWorthApiV3";
+var STORAGE="workWorthApiV4";
 var state={answers:{},currentId:"q1",path:[]};
 
 var workTypes={
@@ -141,6 +141,10 @@ var questions=[
 {id:"q16",section:"可持续性",title:"过去4周，有多少个工作日，你实际工作时间比平时明显更长？",help:"大约比你自己的普通工作日多2小时以上。这里看异常延长，不用拿自己和别人比。",type:"single",options:function(){return [opt("0","0天"),opt("1to2","1–2天"),opt("3to5","3–5天"),opt("6to10","6–10天"),opt("11plus","11天以上")];}},
 {id:"q17",section:"可持续性",title:"过去4周，下班后或休息日，你平均每周有多少次需要继续处理工作？",help:"只算因为工作需要必须处理。你主动把弹性工作安排到晚上，不自动算侵入。",type:"single",options:function(){return [opt("0","基本没有"),opt("1","每周约1次"),opt("2to3","每周2–3次"),opt("4to5","每周4–5次"),opt("daily","几乎每天")];}},
 {id:"q18",section:"可持续性",title:"过去3个月，有多少次已经安排好的私人计划，因为工作被迫取消、明显推迟或大幅缩短？",type:"single",options:function(){return [opt("0","0次"),opt("1to2","1–2次"),opt("3to5","3–5次"),opt("6to10","6–10次"),opt("10plus","10次以上"),opt("unknown","平时很少安排私人计划，不好判断")];}},
+{id:"q18a",section:"可持续性",title:"过去4周，领导、同事或其他工作关系本身，给你的压力有多大？",help:"这里只看人际关系带来的额外消耗，不把正常工作量重复算进去。",type:"single",options:function(){return [opt("none","几乎没有，整体相处正常"),opt("small","偶尔有摩擦，但很快能过去"),opt("regular","经常需要忍着、提防，或者沟通本身很累"),opt("spill","已经明显影响我的情绪或下班后的状态"),opt("severe","经常出现针对、羞辱、排挤、甩锅或明显不公平对待")];}},
+{id:"q18b",section:"可持续性",title:"这种人际压力主要来自哪里？",type:"single",showIf:function(a){return ["regular","spill","severe"].indexOf(a.q18a)>=0;},options:function(){return [opt("manager","直属领导"),opt("peers","同事 / 团队成员"),opt("external","跨部门、客户或合作方"),opt("multiple","好几方面都有"),opt("climate","很难说是哪一个人，主要是整个氛围")];}},
+{id:"q18c",section:"可持续性",title:"过去6个月，重要的分工、绩效评价、奖金或晋升规则，整体有多公平、可预期？",help:"不是问每次结果都合不合你心意，而是规则是否相对稳定、解释得通。",type:"single",options:function(){return [opt("clear","大体公平，而且规则比较清楚"),opt("mostly","偶尔不一致，但总体还能预期"),opt("mixed","有时公平，有时说不准"),opt("unfair","经常觉得分配或评价不太公平"),opt("arbitrary","规则经常变化，结果也很难靠正常表现解释")];}},
+{id:"q18d",section:"可持续性",title:"你现在有多常遇到：要为结果负责，但职责、优先级或决定权并不清楚？",help:"比如任务反复变化、多人给出冲突要求，或者需要承担结果却没有相应决定权。",type:"single",options:function(){return [opt("rare","几乎没有"),opt("occasional","偶尔有，但通常能解决"),opt("regular","比较常见，需要反复确认或协调"),opt("frequent","经常发生，容易返工或承担不清楚的责任"),opt("constant","几乎一直如此，责任和权限明显不匹配")];}},
 {id:"q19",section:"离开能力",title:"如果从下个月开始暂时没有工作收入，每月最低需要多少钱维持正常生活？",help:"算房租/房贷、吃饭、交通、保险、必要债务和必要家庭支出；先不算旅游、投资和非必要购物。",type:"single",options:function(){return [opt("lt3","3000元以下"),opt("3to5","3000–5000元"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30plus","3万元以上")];}},
 {id:"q20",section:"离开能力",title:"如果暂时没有工作收入，目前有多少资金是真正可以拿来维持生活的？",help:"算现金、存款和容易变现且你愿意使用的资产；不算房子、车、未归属股权或你明确不会动用的钱。",type:"single",options:function(){return [opt("lt10","1万元以下"),opt("10to30","1–3万元"),opt("30to50","3–5万元"),opt("50to100","5–10万元"),opt("100to200","10–20万元"),opt("200to500","20–50万元"),opt("500to1000","50–100万元"),opt("1000plus","100万元以上")];}},
 {id:"q21",section:"离开能力",title:"下面哪些现实条件会限制你换工作？",help:"可多选。这里先记录限制类型，下一题再问实际影响有多大。",type:"multi",exclusive:["none"],options:function(){return [opt("visa","签证 / 工作许可与当前雇主有关"),opt("noncompete","竞业 / 服务期 / 合同限制"),opt("notice","很长的离职通知期"),opt("care","家庭照护责任"),opt("geo","地点限制明显"),opt("license","执照 / 资格限制"),opt("other","其他现实限制"),opt("none","没有明显限制")];}},
@@ -246,6 +250,7 @@ function renderApiResult(data){
  html+='<p class="stage-summary">'+escapeHtml(c.intro||"")+'</p>';
 
  if(risk.level==="high"&&c.risk)html+='<div class="risk-note">'+escapeHtml(c.risk)+'</div>';
+ if(c.workplace)html+='<div class="'+((data.workplace&&data.workplace.level==="high")?"risk-note":"info-note")+'">'+escapeHtml(c.workplace)+'</div>';
 
  if(stage.adjacent){
   var adj=stage.adjacent,bn;
