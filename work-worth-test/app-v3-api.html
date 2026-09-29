@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#f6f3ec">
 <meta name="description" content="从当前回报、未来增值、可持续性和离开能力四个维度，看这份工作还值不值得再待一年。">
 <title>这份工作，还值得再待一年吗？</title>
+<link rel="preconnect" href="https://work-worth-test-api-production.up.railway.app" crossorigin>
+<link rel="dns-prefetch" href="//work-worth-test-api-production.up.railway.app">
 <style>
 :root{--bg:#f6f3ec;--paper:#fffdf8;--ink:#202522;--muted:#69716c;--line:#e4dfd5;--accent:#2f6f5e;--accent-soft:#eaf2ee;--warn:#9b5742;--warn-soft:#f8ece7;--shadow:0 14px 40px rgba(35,43,39,.08)}
 *{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--ink);background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
@@ -25,6 +27,7 @@ h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacin
 .boundary-note,.info-note,.risk-note{margin-top:14px;padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.65}.boundary-note{background:#f5eee7;color:#765940}.info-note{background:#edf3f0;color:#49645b}.risk-note{background:var(--warn-soft);color:#7d4939;border-left:4px solid var(--warn)}
 .score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}.score-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px}.score-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.score-name{font-size:14px;color:var(--muted)}.score-num{font-size:25px;font-weight:800}.score-track{height:8px;background:#ebe7df;border-radius:999px;overflow:hidden;margin-top:11px}.score-fill{height:100%;border-radius:999px;background:var(--accent)}.score-tag{font-size:12px;color:var(--muted);margin-top:8px}
 .section-card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:21px 19px;margin:12px 0}.section-card h2{font-size:21px;line-height:1.4;margin:0 0 12px}.section-card h3{font-size:17px;line-height:1.55;margin:18px 0 7px}.section-card p{font-size:16px;line-height:1.82;color:#444d48;margin:0 0 12px}.section-card p:last-child{margin-bottom:0}.callout{border-left:4px solid var(--accent);padding:12px 14px;background:#f2f6f4;border-radius:0 14px 14px 0;font-size:15px;line-height:1.75;color:#3f4944;margin-top:12px}.callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}.result-actions{padding:10px 0 20px}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1f2723;color:#fff;padding:11px 16px;border-radius:999px;font-size:13px;box-shadow:0 10px 24px rgba(0,0,0,.18);z-index:99}
+.result-loading{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 18px}.result-spinner{width:42px;height:42px;border:4px solid #dfe8e3;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:20px}.result-loading h2{font-size:23px;margin:0 0 8px}.result-loading p{font-size:14px;line-height:1.7;color:var(--muted);margin:0}.result-error{text-align:center;padding:34px 18px}.result-error h2{font-size:22px;margin:0 0 10px}.result-error p{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 18px}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:560px){
 .app-shell{padding:10px 12px calc(24px + env(safe-area-inset-bottom))}
 .feature-grid{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:112px 1fr;align-items:center}.feature b{margin:0}
@@ -77,7 +80,7 @@ h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacin
 (function(){
 "use strict";
 var $=function(s){return document.querySelector(s);};
-var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#resultContent"),card=$("#questionCard"),nextBtn=$("#nextBtn"),backBtn=$("#backBtn"),quizActions=document.querySelector(".quiz-actions");
+var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#resultContent"),card=$("#questionCard"),nextBtn=$("#nextBtn"),backBtn=$("#backBtn"),quizActions=document.querySelector(".quiz-actions"),resultActions=document.querySelector(".result-actions");
 var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
 var autoAdvanceTimer=null;
 function cancelAutoAdvance(){if(autoAdvanceTimer){clearTimeout(autoAdvanceTimer);autoAdvanceTimer=null;}}
@@ -291,23 +294,32 @@ function renderApiResult(data){
  result.dataset.scores=JSON.stringify(s);
 }
 
+function renderLoadingResult(){
+ resultContent.innerHTML='<div class="result-loading"><div class="result-spinner" aria-hidden="true"></div><h2>正在生成结果</h2><p>正在把你的回答整理成四个维度，大多数情况下很快就会完成。</p></div>';
+ resultActions.classList.add("hidden");
+ show(result);
+}
+function renderResultError(){
+ resultContent.innerHTML='<div class="result-hero result-error"><h2>结果暂时没有生成出来</h2><p>你的答案还保存在当前浏览器，可以直接重新生成，不需要重新答题。</p><button id="retryResultBtn" class="primary-btn">重新生成结果</button><button id="backToQuizBtn" class="ghost-btn">返回上一题</button></div>';
+ resultActions.classList.add("hidden");
+ var retry=$("#retryResultBtn"),back=$("#backToQuizBtn");
+ if(retry)retry.addEventListener("click",finish);
+ if(back)back.addEventListener("click",function(){show(quiz);renderQuestion();});
+}
 async function finish(){
+ cancelAutoAdvance();
  nextBtn.disabled=true;
- var oldText=nextBtn.textContent;
- nextBtn.textContent="生成结果中…";
+ renderLoadingResult();
  try{
   var data=await requestResult();
   renderApiResult(data);
-  show(result);
+  resultActions.classList.remove("hidden");
   save();
  }catch(e){
   console.error(e);
-  toast("结果生成失败，请稍后重试");
-  nextBtn.disabled=false;
-  nextBtn.textContent="重试生成结果";
-  return;
+  renderResultError();
  }
- nextBtn.textContent=oldText;
+ nextBtn.disabled=false;
 }
 function reset(){cancelAutoAdvance();state={answers:{},currentId:"q1",path:[]};clearSaved();show(landing);$("#resumeBtn").classList.add("hidden");}
 function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(function(){t.classList.add("hidden");},1800);}
