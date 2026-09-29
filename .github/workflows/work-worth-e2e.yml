@@ -64,11 +64,13 @@ jobs:
                 await next.click();
               }
             }else{
-              await page.waitForFunction(
-                old=>document.querySelector('#result:not(.hidden)') || (document.querySelector('#progressLabel')?.textContent||'').trim()!==old,
-                before,
-                {timeout:3000}
-              );
+              await page.waitForTimeout(700);
+              const after=await page.locator('#result:not(.hidden)').count()
+                ? 'RESULT'
+                : (await page.locator('#progressLabel').innerText()).trim();
+              const selected=await page.locator('#questionCard .option.selected').count();
+              console.log('AUTO',before,'->',after,'selected=',selected);
+              assert.notEqual(after,before,'single-select auto-advance from '+before);
             }
           }
 
