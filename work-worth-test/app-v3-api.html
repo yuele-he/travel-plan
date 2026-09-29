@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f3ec">
+<meta name="description" content="从当前回报、未来增值、可持续性和离开能力四个维度，看这份工作还值不值得再待一年。">
+<title>这份工作，还值得再待一年吗？</title>
+<style>
+:root{--bg:#f6f3ec;--paper:#fffdf8;--ink:#202522;--muted:#69716c;--line:#e4dfd5;--accent:#2f6f5e;--accent-soft:#eaf2ee;--warn:#9b5742;--warn-soft:#f8ece7;--shadow:0 14px 40px rgba(35,43,39,.08)}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--ink);background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}.app-shell{width:min(100%,760px);margin:0 auto;min-height:100vh;padding:22px 18px 46px}.screen{min-height:calc(100vh - 68px)}
+.landing-screen{display:flex;flex-direction:column;justify-content:center;padding:30px 0}.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:16px}
+h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacing:-.035em}.lead{font-size:18px;line-height:1.8;color:#454d48;margin:0 0 24px}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 18px}.feature{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px 13px;box-shadow:0 8px 24px rgba(35,43,39,.04)}
+.feature b{display:block;font-size:16px;margin-bottom:6px}.feature span{display:block;font-size:12px;line-height:1.55;color:var(--muted)}.privacy-note{font-size:13px;line-height:1.6;color:var(--muted);margin:4px 0 22px}
+.primary-btn,.ghost-btn{width:100%;border-radius:16px;padding:15px 18px;font-weight:700;font-size:17px;transition:.18s ease}.primary-btn{border:0;background:var(--accent);color:#fff;box-shadow:0 10px 24px rgba(47,111,94,.18)}
+.primary-btn:disabled{opacity:.38;box-shadow:none;cursor:not-allowed}.primary-btn:not(:disabled):active{transform:translateY(1px)}.ghost-btn{margin-top:10px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.quiz-header{display:flex;align-items:center;gap:14px;position:sticky;top:0;background:rgba(246,243,236,.94);backdrop-filter:blur(8px);padding:10px 0 16px;z-index:5}.icon-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:20px;color:var(--ink)}
+.progress-wrap{flex:1}.progress-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin-bottom:8px}.progress-track{height:6px;border-radius:999px;background:#e6e1d8;overflow:hidden}.progress-bar{height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .25s ease}
+.question-card{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:24px 20px;box-shadow:var(--shadow);min-height:430px}.q-kicker{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:12px}.q-title{font-size:26px;line-height:1.45;margin:0 0 10px;letter-spacing:-.02em}.q-help{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px}
+.options{display:grid;gap:10px}.option{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid #ddd8ce;border-radius:15px;padding:14px 15px;color:var(--ink);line-height:1.55;transition:.15s ease}.option:hover{border-color:#b8c9c2}.option.selected{background:var(--accent-soft);border-color:#8fb4a7}
+.option-dot{width:21px;height:21px;border-radius:50%;border:1.5px solid #aaa;flex:0 0 auto;margin-top:2px;display:grid;place-items:center;font-size:13px;color:#fff}.option.selected .option-dot{border-color:var(--accent);background:var(--accent)}.option.checkbox .option-dot{border-radius:6px}.multi-note{font-size:12px;color:var(--muted);margin:0 0 12px}.quiz-actions{padding:16px 0 8px}
+.result-hero{background:var(--paper);border:1px solid var(--line);border-radius:26px;padding:26px 22px;box-shadow:var(--shadow);margin-bottom:16px}.result-label{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:10px}.stage-title{font-size:38px;line-height:1.15;margin:0 0 12px;letter-spacing:-.03em}.stage-summary{font-size:17px;line-height:1.8;color:#434b47;margin:0 0 10px}
+.boundary-note,.info-note,.risk-note{margin-top:14px;padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.65}.boundary-note{background:#f5eee7;color:#765940}.info-note{background:#edf3f0;color:#49645b}.risk-note{background:var(--warn-soft);color:#7d4939;border-left:4px solid var(--warn)}
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}.score-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px}.score-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.score-name{font-size:14px;color:var(--muted)}.score-num{font-size:25px;font-weight:800}.score-track{height:8px;background:#ebe7df;border-radius:999px;overflow:hidden;margin-top:11px}.score-fill{height:100%;border-radius:999px;background:var(--accent)}.score-tag{font-size:12px;color:var(--muted);margin-top:8px}
+.section-card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:21px 19px;margin:12px 0}.section-card h2{font-size:21px;line-height:1.4;margin:0 0 12px}.section-card h3{font-size:17px;line-height:1.55;margin:18px 0 7px}.section-card p{font-size:16px;line-height:1.82;color:#444d48;margin:0 0 12px}.section-card p:last-child{margin-bottom:0}.callout{border-left:4px solid var(--accent);padding:12px 14px;background:#f2f6f4;border-radius:0 14px 14px 0;font-size:15px;line-height:1.75;color:#3f4944;margin-top:12px}.callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}.result-actions{padding:10px 0 20px}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1f2723;color:#fff;padding:11px 16px;border-radius:999px;font-size:13px;box-shadow:0 10px 24px rgba(0,0,0,.18);z-index:99}
+@media(max-width:560px){.app-shell{padding:14px 14px 34px}.feature-grid{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:112px 1fr;align-items:center}.feature b{margin:0}.question-card{padding:22px 17px;min-height:420px}.q-title{font-size:23px}.stage-title{font-size:34px}}
+@media(max-width:360px){.score-grid{grid-template-columns:1fr}.q-title{font-size:22px}}
+</style>
+</head>
+<body>
+<main class="app-shell">
+<section id="landing" class="screen landing-screen">
+<div class="eyebrow">工作决策测试 · 完整版</div>
+<h1>这份工作，<br>还值得再待一年吗？</h1>
+<p class="lead">不只看工资。我们会把你的<strong>当前回报、未来增值、可持续性和离开能力</strong>拆开看，再结合你真正想改善的事情、值得等的节点和现实风险。</p>
+<div class="feature-grid">
+<div class="feature"><b>约 6–9 分钟</b><span>按收入和工作类型自动换题</span></div>
+<div class="feature"><b>4 个维度</b><span>不压成一个笼统总分</span></div>
+<div class="feature"><b>16 种阶段</b><span>给判断依据，不替你做决定</span></div>
+</div>
+<div class="privacy-note">答题进度会保存在当前浏览器；生成结果时，答案会发送到计算服务进行分析。当前不建立用户数据库。</div>
+<button id="startBtn" class="primary-btn">开始测试</button>
+<button id="resumeBtn" class="ghost-btn hidden">继续上次测试</button>
+</section>
+
+<section id="quiz" class="screen hidden">
+<header class="quiz-header">
+<button id="backBtn" class="icon-btn" aria-label="上一题">←</button>
+<div class="progress-wrap"><div class="progress-meta"><span id="progressLabel"></span><span id="progressText"></span></div><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div></div>
+</header>
+<div id="questionCard" class="question-card"></div>
+<div class="quiz-actions"><button id="nextBtn" class="primary-btn" disabled>下一题</button></div>
+</section>
+
+<section id="result" class="screen hidden">
+<div id="resultContent"></div>
+<div class="result-actions"><button id="copyBtn" class="primary-btn">复制结果摘要</button><button id="restartBtn" class="ghost-btn">重新测试</button></div>
+</section>
+</main>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s);};
+var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#resultContent"),card=$("#questionCard"),nextBtn=$("#nextBtn"),backBtn=$("#backBtn");
+var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
+var STORAGE="workWorthFullV2";
+var state={answers:{},currentId:"q1",path:[]};
+
+var workTypes={
+ technical:"技术 / 研发 / 数据 / 工程",
+ office:"职能 / 产品 / 办公室工作",
+ sales:"销售 / 商务 / 客户工作",
+ frontline:"一线运营 / 服务 / 生产",
+ creative:"创意 / 内容 / 设计",
+ professional:"教育 / 医疗 / 咨询及其他专业服务",
+ other:"其他"
+};
+
+var workExamples={
+ technical:{out:"例如完成、上线或交付的项目、模块、分析或关键技术任务。",proof:"例如性能改善、上线采用、准确率提升、故障减少、验收通过。"},
+ office:{out:"例如落地的方案、流程、制度、分析或跨部门项目。",proof:"例如提速、降成本、减少错误、支持关键决策或正式落地。"},
+ sales:{out:"例如重要成交、续约、重点客户项目或新区域开拓。",proof:"例如超目标、续约、客户增长、收入增长或关键客户认可。"},
+ frontline:{out:"例如独立承担的新岗位、重要职责、异常处理或流程改善。",proof:"例如效率、质量、客诉、库存、交付或现场结果改善。"},
+ creative:{out:"例如正式发布、交付、可进入作品集的作品或完整项目。",proof:"例如采用、传播、商业结果、客户认可或关键提案通过。"},
+ professional:{out:"例如重要案例、课程、研究、专业方案、咨询交付或正式成果。",proof:"例如采用、验收、发表、资格认可、客户或专业结果改善。"},
+ other:{out:"例如以后换工作时，你仍愿意拿出来讲的一项完整工作成果。",proof:"例如上线、采用、验收、客户认可、效率改善或其他明确变化。"}
+};
+
+function opt(value,label){return {value:value,label:label};}
+function isShortTenure(){return ["lt3","3to6","6to12"].indexOf(state.answers.q3)>=0;}
+function q10Title(){return isShortTenure()?"按目前公司的制度和实际情况，你一年通常大约能完整休掉多少个原本会工作的日子？":"过去12个月，除了正常休息日和法定节假日，你大约有多少个原本会工作的日子，可以完整不工作？";}
+function q11Title(){var base=["commission","project"].indexOf(state.answers.q2)>=0?"先不算特别高或特别低的偶发月份，和之前相比，你现在大多数月份通常能拿到的收入变化了多少？":"和之前相比，你现在每月比较稳定能拿到的收入变化了多少？";return isShortTenure()?base.replace("和之前相比","和刚进入目前岗位时相比"):base.replace("和之前相比","和大约一年前相比");}
+function q4Title(){var t=state.answers.q2;if(t==="commission")return "过去6个月，你平均每月实际拿到的总收入大约是多少？";if(t==="hourly")return "过去3个月，你平均每月实际拿到的收入大约是多少？";if(t==="project")return "过去6个月，你平均每月实际收到的项目或客户收入大约是多少？";return "每月比较稳定能拿到多少收入？";}
+function q6Title(){return state.answers.q2==="project"?"以你现在的工作量和经验来看，你的收入或收费水平在类似同行中大概在哪？":"和同城市、经验相近、职责相似的岗位相比，你现在的总收入大概在哪？";}
+function q13Help(){return (workExamples[state.answers.q1]||workExamples.other).out+" 一项完整成果最好能说清：背景、你负责什么、最后交付了什么。";}
+function q14Help(){return (workExamples[state.answers.q1]||workExamples.other).proof+" 不一定必须是数字，但要能说明你的贡献和最后发生的变化。";}
+function q22Title(){return state.answers.q2==="project"?"过去6个月，你对新的客户或项目机会验证到哪一步？":"过去6个月，你对外部工作机会验证到哪一步？";}
+function q25Options(){var a=[
+ opt("pay","工资 / 奖金 / 报销出现拖欠"),
+ opt("layoff","频繁裁员 / 缩编 / 冻结招聘"),
+ opt("shrink","核心业务 / 订单 / 项目明显收缩"),
+ opt("role","我的岗位可能被取消、合并、外包或缩减"),
+ opt("attrition","关键成员持续离开"),
+ opt("budget","预算 / 资源 / 项目明显减少")
+];if(state.answers.q2==="project"){a.push(opt("clientEnd","主要客户 / 订单来源明显减少或即将结束"));a.push(opt("concentration","收入高度依赖单一客户，后续合作不确定"));}a.push(opt("none","没有明显风险"));a.push(opt("unknown","不清楚"));return a;}
+
+var questions=[
+{id:"q1",section:"基础信息",title:"你现在主要做哪类工作？",help:"选最接近你日常核心工作的那一类。",type:"single",options:function(){return Object.keys(workTypes).map(function(k){return opt(k,workTypes[k]);});}},
+{id:"q2",section:"基础信息",title:"你的收入主要怎么计算？",type:"single",options:function(){return [opt("fixed","固定月薪为主"),opt("bonus","固定工资 + 较明显奖金 / 绩效"),opt("commission","底薪 + 提成 / 佣金"),opt("hourly","按工时 / 班次计薪"),opt("project","按项目 / 订单 / 客户结算")];}},
+{id:"q3",section:"基础信息",title:"你在目前这份主要岗位 / 工作内容里做多久了？",help:"如果最近在同一家公司明显换岗，按现在主要做的工作计算。",type:"single",options:function(){return [opt("lt3","不足3个月"),opt("3to6","3–6个月"),opt("6to12","6–12个月"),opt("1to2","1–2年"),opt("2to5","2–5年"),opt("5plus","5年以上")];}},
+{id:"q4",section:"当前回报",title:q4Title,help:"优先按实际拿到手、你自己最熟悉的口径来选；后面会单独比较市场位置。",type:"single",options:function(){return [opt("lt5","5000元以下"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30to50","3–5万元"),opt("50plus","5万元以上")];}},
+{id:"q5",section:"当前回报",title:"过去12个月，你实际拿到的奖金、绩效或其他额外收入，大约相当于几个月固定月收入？",help:"只算已经实际拿到、已经归属、可以使用的收入。未来奖金和未归属股权先不算。",type:"single",showIf:function(a){return a.q2==="fixed"||a.q2==="bonus";},options:function(){return [opt("0","没有"),opt("lt0.5","不到0.5个月"),opt("0.5to1","0.5–1个月"),opt("1to2","1–2个月"),opt("2to4","2–4个月"),opt("4plus","4个月以上")];}},
+{id:"q6",section:"当前回报",title:q6Title,help:"尽量参考最近的真实岗位、猎头沟通、面试、offer或同行信息。不知道就直接选“不清楚”。",type:"single",options:function(){return [opt("low20","明显偏低，约低20%以上"),opt("low10","略低，约低10%–20%"),opt("same","大致相当，约±10%"),opt("high10","略高，约高10%–20%"),opt("high20","明显偏高，高20%以上"),opt("unknown","不清楚 / 最近没认真比较")];}},
+{id:"q7",section:"当前回报",title:"过去4周，平均每周有多少天需要工作？",help:"半天可以按0.5天算；偶尔只看一条消息不算完整工作日。",type:"single",options:function(){return [opt("3","3天及以下"),opt("4","4天"),opt("5","5天"),opt("5.5","约5.5天"),opt("6","6天"),opt("6.5","约6.5天"),opt("7","7天")];}},
+{id:"q8",section:"当前回报",title:"一个普通工作日，你通常实际工作多久？",help:"不算通勤和正常午休；如果晚上碎片化处理工作已经是日常，也算进当天总时间。",type:"single",options:function(){return [opt("7.5","8小时以内"),opt("8","约8小时"),opt("9","约9小时"),opt("10","约10小时"),opt("11","约11小时"),opt("12","12小时以上")];}},
+{id:"q9",section:"当前回报",title:"一个普通工作日，你往返通勤通常需要多久？",help:"混合办公按过去4周平均到每个工作日；偶发出差不算。",type:"single",options:function(){return [opt("0","0 / 基本居家"),opt("0.25","30分钟以内"),opt("0.75","30–60分钟"),opt("1.25","1–1.5小时"),opt("1.75","1.5–2小时"),opt("2.5","2–3小时"),opt("3.5","3小时以上")];}},
+{id:"q10",section:"当前回报",title:q10Title,help:"包括实际能用的年假、调休或可自行安排的完整休息日；不算正常周末、法定节假日和病假。当天仍工作较长时间就不算完整休息。",type:"single",options:function(){return [opt("0to3","0–3天"),opt("4to7","4–7天"),opt("8to10","8–10天"),opt("11to15","11–15天"),opt("16to20","16–20天"),opt("20plus","20天以上")];}},
+{id:"q11",section:"未来增值",title:q11Title,type:"single",options:function(){return [opt("down","下降"),opt("same","基本没变"),opt("lt1","增加不到1000元"),opt("1to3","增加1000–3000元"),opt("3to5","增加3000–5000元"),opt("5plus","增加5000元以上"),opt("na","时间太短 / 很难比较")];}},
+{id:"q12",section:"未来增值",title:"过去12个月，你的正式职位或职级有变化吗？",help:"这里只看正式职位或职级；实际责任有没有变大，下一题会另外问。任职不足一年按入职以来回答。",type:"single",options:function(){return [opt("none","没有变化"),opt("title","主要是title变化，级别基本没变"),opt("level","明确晋升一级"),opt("major","明显进入更高一级岗位 / 层级"),opt("nohierarchy","没有明确职级体系"),opt("short","任职时间太短，不适合判断")];}},
+{id:"q13",section:"未来增值",title:"过去12个月，你完成了多少项以后换工作时也值得讲的完整工作成果？",help:q13Help,type:"single",options:function(){return [opt("none","基本没有"),opt("one","1项"),opt("two3","2–3项"),opt("fourplus","4项以上"),opt("long","一个重要长期项目仍在进行，还没完整结束")];}},
+{id:"q14",section:"未来增值",title:"过去12个月，你有没有能比较清楚证明自己工作价值的结果？",help:q14Help,type:"single",options:function(){return [opt("none","基本没有"),opt("vague","有一些，但比较模糊"),opt("tooSoon","成果刚完成，还没来得及验证结果"),opt("one","有1项比较明确的结果"),opt("two3","有2–3项明确结果"),opt("strong","有多项明确结果，或1项影响很大的结果")];}},
+{id:"q15",section:"未来增值",title:"过去12个月，你新增的最高责任层级更接近哪一种？",help:"只看过去一年新增加、并且已经稳定承担的部分。原本就有的职责不重复计分。",type:"single",options:function(){return [opt("none","没有明显新增责任"),opt("independent","开始独立负责完整工作"),opt("judgment","开始自己做方案、判断、处理复杂问题"),opt("scope","原责任层级相近，但负责的业务、客户、预算、项目或团队范围明显扩大"),opt("coordinate","开始协调、指导或审核别人"),opt("outcome","开始对更大的项目、指标或团队结果负责")];}},
+{id:"q16",section:"可持续性",title:"过去4周，有多少个工作日，你实际工作时间比平时明显更长？",help:"大约比你自己的普通工作日多2小时以上。这里看异常延长，不用拿自己和别人比。",type:"single",options:function(){return [opt("0","0天"),opt("1to2","1–2天"),opt("3to5","3–5天"),opt("6to10","6–10天"),opt("11plus","11天以上")];}},
+{id:"q17",section:"可持续性",title:"过去4周，下班后或休息日，你平均每周有多少次需要继续处理工作？",help:"只算因为工作需要必须处理。你主动把弹性工作安排到晚上，不自动算侵入。",type:"single",options:function(){return [opt("0","基本没有"),opt("1","每周约1次"),opt("2to3","每周2–3次"),opt("4to5","每周4–5次"),opt("daily","几乎每天")];}},
+{id:"q18",section:"可持续性",title:"过去3个月，有多少次已经安排好的私人计划，因为工作被迫取消、明显推迟或大幅缩短？",type:"single",options:function(){return [opt("0","0次"),opt("1to2","1–2次"),opt("3to5","3–5次"),opt("6to10","6–10次"),opt("10plus","10次以上"),opt("unknown","平时很少安排私人计划，不好判断")];}},
+{id:"q19",section:"离开能力",title:"如果从下个月开始暂时没有工作收入，每月最低需要多少钱维持正常生活？",help:"算房租/房贷、吃饭、交通、保险、必要债务和必要家庭支出；先不算旅游、投资和非必要购物。",type:"single",options:function(){return [opt("lt3","3000元以下"),opt("3to5","3000–5000元"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30plus","3万元以上")];}},
+{id:"q20",section:"离开能力",title:"如果暂时没有工作收入，目前有多少资金是真正可以拿来维持生活的？",help:"算现金、存款和容易变现且你愿意使用的资产；不算房子、车、未归属股权或你明确不会动用的钱。",type:"single",options:function(){return [opt("lt10","1万元以下"),opt("10to30","1–3万元"),opt("30to50","3–5万元"),opt("50to100","5–10万元"),opt("100to200","10–20万元"),opt("200to500","20–50万元"),opt("500to1000","50–100万元"),opt("1000plus","100万元以上")];}},
+{id:"q21",section:"离开能力",title:"下面哪些现实条件会限制你换工作？",help:"可多选。这里先记录限制类型，下一题再问实际影响有多大。",type:"multi",exclusive:["none"],options:function(){return [opt("visa","签证 / 工作许可与当前雇主有关"),opt("noncompete","竞业 / 服务期 / 合同限制"),opt("notice","很长的离职通知期"),opt("care","家庭照护责任"),opt("geo","地点限制明显"),opt("license","执照 / 资格限制"),opt("other","其他现实限制"),opt("none","没有明显限制")];}},
+{id:"q21b",section:"离开能力",title:"这些条件实际会多大程度影响你转到下一份合适的工作？",type:"single",showIf:function(a){return Array.isArray(a.q21)&&a.q21.some(function(x){return x!=="none";});},options:function(){return [opt("none","基本没有影响"),opt("small","有影响，但很小"),opt("narrow","会明显缩小可选范围"),opt("slow","会明显拖慢转换"),opt("block","短期内很可能直接卡住"),opt("unknown","不确定")];}},
+{id:"q22",section:"离开能力",title:q22Title,type:"single",options:function(){if(state.answers.q2==="project")return [opt("none","还没有认真验证过"),opt("browse","只看过渠道或机会"),opt("few","少量接触，样本还太小"),opt("noresponse","主动接触过一批匹配客户，基本没反馈"),opt("talk","有明确询盘 / 深入沟通"),opt("quote","已经到报价 / 合作讨论"),opt("signed","已经拿到实际付费项目 / 合同")];return [opt("none","还没有认真验证过"),opt("browse","主要只是看过真实岗位"),opt("few","投过少量岗位，样本还太小"),opt("nointerview","认真申请过一批匹配岗位，基本没进面试"),opt("interview","拿到过正式面试"),opt("final","进入过后期面试 / 薪资沟通"),opt("offer","拿到正式offer")];}},
+{id:"q22a",section:"离开能力",title:"目前了解到的外部机会，实际可能给你的总收入和现在相比大概怎么样？",help:"尽量参考招聘方沟通、谈薪或真实offer；只有职位页面上的数字可以选“不清楚”。",type:"single",showIf:function(a){return ["interview","final","offer","talk","quote","signed"].indexOf(a.q22)>=0;},options:function(){return [opt("lower","低10%以上"),opt("same","大致±10%"),opt("lt10","高不到10%"),opt("10to30","高10%–30%"),opt("30plus","高30%以上"),opt("unknown","还不清楚 / 没谈到")];}},
+{id:"q22b",section:"离开能力",title:"这个已经比较明确的机会，现实中你会认真考虑，而且条件允许入职 / 合作吗？",help:"这里同时考虑地点、方向、合同、身份等现实条件。",type:"single",showIf:function(a){return a.q22==="offer"||a.q22==="signed";},options:function(){return [opt("yes","会，而且现实中可以执行"),opt("maybe","有可能，但还有明显条件没解决"),opt("no","基本不会考虑 / 现实中不可执行")];}},
+{id:"q23",section:"你的优先级",title:"如果接下来6–12个月只能优先改善一件事，你最希望是什么？",type:"single",options:function(){return [opt("income","收入更高"),opt("growth","学到更多 / 获得更有价值的工作"),opt("life","少工作一点，有更多私人时间"),opt("stability","更稳定、风险更低"),opt("location","地点 / 通勤 / 家庭安排更合适"),opt("satisfied","目前整体满意，没有特别想改变")];}},
+{id:"q24",section:"补充判断",title:"未来6–12个月，你有没有一个比较明确、值得等的节点？",help:"可多选。只选时间和条件相对清楚、而且真的会增加收入、履历或选择权的节点。",type:"multi",exclusive:["none","vague"],options:function(){return [opt("promotion","晋升 / 调薪"),opt("bonus","奖金 / 提成 / 股权归属"),opt("project","重要项目完成 / 上线 / 验收"),opt("contract","合同 / 服务期 / 身份 / 工作许可节点"),opt("certificate","证书 / 职称"),opt("org","明确的组织 / 岗位变化"),opt("vague","有一些可能，但目前不够明确"),opt("none","没有明确节点")];}},
+{id:"q24b",section:"补充判断",title:"你刚才选的节点，目前大概有多确定？",type:"single",showIf:function(a){return Array.isArray(a.q24)&&a.q24.some(function(x){return ["none","vague"].indexOf(x)<0;});},options:function(){return [opt("certain","基本确定"),opt("likely","很可能，但还有一些不确定"),opt("verbal","主要是口头预期"),opt("uncertain","很不确定")];}},
+{id:"q25",section:"补充判断",title:"最近6个月，公司、岗位或收入来源有没有出现这些变化？",help:"可多选。它们不会直接平均进四维分数，但可能改变结果页最先提醒你的事情。",type:"multi",exclusive:["none","unknown"],options:q25Options},
+{id:"q25b",section:"补充判断",title:"你刚才选的这些风险，目前有多确定？",type:"single",showIf:function(a){return Array.isArray(a.q25)&&a.q25.some(function(x){return ["none","unknown"].indexOf(x)<0;});},options:function(){return [opt("fact","已经明确发生 / 有事实依据"),opt("sign","有明显迹象，但尚未完全确认"),opt("rumor","主要来自传闻或担心"),opt("unknown","不确定")];}}
+];
+
+function getQ(id){for(var i=0;i<questions.length;i++)if(questions[i].id===id)return questions[i];return null;}
+function titleOf(q){return typeof q.title==="function"?q.title(state.answers):q.title;}
+function helpOf(q){return typeof q.help==="function"?q.help(state.answers):q.help;}
+function optionsOf(q){return typeof q.options==="function"?q.options(state.answers):q.options;}
+function visibleQuestions(){return questions.filter(function(q){return !q.showIf||q.showIf(state.answers);});}
+function optionObj(id,value){var q=getQ(id);if(!q)return null;var o=optionsOf(q);for(var i=0;i<o.length;i++)if(o[i].value===value)return o[i];return null;}
+function label(id){var a=state.answers[id];if(Array.isArray(a))return a.map(function(v){var o=optionObj(id,v);return o?o.label:v;}).join("、");var x=optionObj(id,a);return x?x.label:"";}
+function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m];});}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));}catch(e){}}
+function load(){try{var s=JSON.parse(localStorage.getItem(STORAGE));if(s&&s.answers&&s.currentId)state=s;}catch(e){}}
+function clearSaved(){try{localStorage.removeItem(STORAGE);}catch(e){}}
+function show(screen){[landing,quiz,result].forEach(function(x){x.classList.add("hidden");});screen.classList.remove("hidden");window.scrollTo(0,0);}
+
+function hasAnswer(q){var a=state.answers[q.id];return q.type==="multi"?Array.isArray(a)&&a.length>0:a!==undefined&&a!==null&&a!=="";}
+function choose(q,value){
+ if(q.type==="multi"){
+   var arr=Array.isArray(state.answers[q.id])?state.answers[q.id].slice():[];
+   var exclusive=q.exclusive||[];
+   if(exclusive.indexOf(value)>=0){arr=arr.indexOf(value)>=0?[]:[value];}
+   else{arr=arr.filter(function(x){return exclusive.indexOf(x)<0;});arr=arr.indexOf(value)>=0?arr.filter(function(x){return x!==value;}):arr.concat([value]);}
+   state.answers[q.id]=arr;
+ }else state.answers[q.id]=value;
+ renderQuestion();
+}
+function renderQuestion(){
+ show(quiz);
+ var q=getQ(state.currentId);if(!q){finish();return;}
+ var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});
+ if(idx<0){state.currentId=visible[0].id;q=getQ(state.currentId);idx=0;}
+ progressBar.style.width=Math.max(4,((idx+1)/visible.length)*100)+"%";
+ progressLabel.textContent=(idx+1)+" / "+visible.length;progressText.textContent=q.section;
+ backBtn.style.visibility=state.path.length?"visible":"hidden";
+ var answer=state.answers[q.id],multi=q.type==="multi",html='<div class="q-kicker">'+escapeHtml(q.section)+'</div><h2 class="q-title">'+escapeHtml(titleOf(q))+'</h2>';
+ var h=helpOf(q);if(h)html+='<p class="q-help">'+escapeHtml(h)+'</p>';if(multi)html+='<p class="multi-note">可多选</p>';html+='<div class="options">';
+ optionsOf(q).forEach(function(o){var selected=multi?(Array.isArray(answer)&&answer.indexOf(o.value)>=0):answer===o.value;html+='<button class="option '+(multi?"checkbox ":"")+(selected?"selected":"")+'" data-value="'+escapeHtml(o.value)+'"><span class="option-dot">'+(selected?"✓":"")+'</span><span>'+escapeHtml(o.label)+'</span></button>';});
+ html+="</div>";card.innerHTML=html;card.querySelectorAll(".option").forEach(function(btn){btn.addEventListener("click",function(){choose(q,btn.dataset.value);});});
+ nextBtn.disabled=!hasAnswer(q);nextBtn.textContent=idx===visible.length-1?"查看结果":"下一题";save();
+}
+function goNext(){var q=getQ(state.currentId);if(!q||!hasAnswer(q))return;var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});if(idx===visible.length-1){finish();return;}state.path.push(q.id);state.currentId=visible[idx+1].id;save();renderQuestion();}
+function goBack(){if(!state.path.length)return;state.currentId=state.path.pop();save();renderQuestion();}
+
+
+var API_BASE="https://work-worth-test-api-production.up.railway.app";
+var dimNames={reward:"当前回报",growth:"未来增值",sustainability:"可持续性",exit:"离开能力"};
+
+async function requestResult(){
+ var controller=new AbortController();
+ var timer=setTimeout(function(){controller.abort();},15000);
+ try{
+  var res=await fetch(API_BASE+"/evaluate",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   credentials:"omit",
+   signal:controller.signal,
+   body:JSON.stringify({answers:state.answers})
+  });
+  var data=null;
+  try{data=await res.json();}catch(e){}
+  if(!res.ok)throw new Error((data&&data.error)||("HTTP_"+res.status));
+  if(!data||!data.scores||!data.stage||!data.dimensions||!data.content)throw new Error("INVALID_API_RESPONSE");
+  return data;
+ }finally{clearTimeout(timer);}
+}
+
+function renderApiResult(data){
+ var s=data.scores,stage=data.stage,c=data.content||{},risk=data.risk||{level:"none"},waiting=data.waiting||{level:"none"};
+ var reasons=c.reasons||{},notes=c.confidence_notes||[];
+ var html='<section class="result-hero"><div class="result-label">你的结果</div><h1 class="stage-title">'+escapeHtml(stage.display_name||stage.name)+'</h1>';
+ if(stage.observe)html+='<p class="stage-summary"><strong>根据目前有限信息，你暂时更接近「'+escapeHtml(stage.name)+'」</strong></p>';
+ else html+='<p class="stage-summary"><strong>'+escapeHtml(stage.labels||"")+'</strong></p>';
+ html+='<p class="stage-summary">'+escapeHtml(c.intro||"")+'</p>';
+
+ if(risk.level==="high"&&c.risk)html+='<div class="risk-note">'+escapeHtml(c.risk)+'</div>';
+
+ if(stage.adjacent){
+  var adj=stage.adjacent,bn;
+  if(adj.count>=2)bn="你有多个维度都靠近分界，目前更像一个过渡状态。最近的相邻阶段是「"+adj.stage+"」。";
+  else bn="「"+(dimNames[adj.dimension]||adj.dimension)+"」目前靠近分界，所以你也接近「"+adj.stage+"」。";
+  html+='<div class="boundary-note">'+escapeHtml(bn)+'</div>';
+ }
+ if(notes.length)html+='<div class="info-note">'+escapeHtml(notes.join(" "))+'</div>';
+ html+='</section><div class="score-grid">';
+
+ ["reward","growth","sustainability","exit"].forEach(function(k){
+  var d=data.dimensions[k];
+  html+='<div class="score-card"><div class="score-head"><span class="score-name">'+dimNames[k]+'</span><span class="score-num">'+d.score+'</span></div><div class="score-track"><div class="score-fill" style="width:'+d.score+'%"></div></div><div class="score-tag">'+escapeHtml(d.label)+'</div></div>';
+ });
+ html+='</div>';
+
+ html+='<section class="section-card"><h2>为什么会落在这里</h2>';
+ html+='<h3>💰 当前回报 '+s.reward+'｜'+escapeHtml(data.dimensions.reward.label)+'</h3><p>'+escapeHtml(reasons.reward||"")+'</p>';
+ html+='<h3>📈 未来增值 '+s.growth+'｜'+escapeHtml(data.dimensions.growth.label)+'</h3><p>'+escapeHtml(reasons.growth||"")+'</p>';
+ html+='<h3>🔋 可持续性 '+s.sustainability+'｜'+escapeHtml(data.dimensions.sustainability.label)+'</h3><p>'+escapeHtml(reasons.sustainability||"")+'</p>';
+ html+='<h3>🚪 离开能力 '+s.exit+'｜'+escapeHtml(data.dimensions.exit.label)+'</h3><p>'+escapeHtml(reasons.exit||"")+'</p></section>';
+
+ if(c.risk||c.waiting){
+  html+='<section class="section-card"><h2>现在还有两个变量值得单独看</h2>';
+  if(c.risk)html+='<div class="callout '+(risk.level==="high"?"warn":"")+'">'+escapeHtml(c.risk)+'</div>';
+  if(c.waiting)html+='<div class="callout">'+escapeHtml(c.waiting)+'</div>';
+  html+='</section>';
+ }
+
+ html+='<section class="section-card"><h2>如果再待半年到一年</h2><p>'+escapeHtml(c.future_good||"")+'</p><p>'+escapeHtml(c.future_warning||"")+'</p></section>';
+ html+='<section class="section-card"><h2>下一步先做一件事</h2><p><strong>'+escapeHtml(c.main_action||"")+'</strong></p>';
+ if(c.priority)html+='<p>'+escapeHtml(c.priority)+'</p>';
+ html+='<p>参考标准：半年以后，你最好能清楚说出自己比今天多了什么；如果新增价值没有出现，就需要重新比较。<br>复盘时间：'+escapeHtml(c.recheck||"")+'</p></section>';
+ html+='<section class="section-card"><p><strong>这只是你现在的工作状态，不是长期标签。</strong> 真正值得判断的，是你现在付出的时间、精力和机会成本，究竟换回了什么；以及下一次复盘时，你会不会比今天拥有更多筹码和更多选择。</p></section>';
+
+ resultContent.innerHTML=html;
+ result.dataset.stage=stage.observe?"观察期（接近"+stage.name+"）":stage.name;
+ result.dataset.scores=JSON.stringify(s);
+}
+
+async function finish(){
+ nextBtn.disabled=true;
+ var oldText=nextBtn.textContent;
+ nextBtn.textContent="生成结果中…";
+ try{
+  var data=await requestResult();
+  renderApiResult(data);
+  show(result);
+  save();
+ }catch(e){
+  console.error(e);
+  toast("结果生成失败，请稍后重试");
+  nextBtn.disabled=false;
+  nextBtn.textContent="重试生成结果";
+  return;
+ }
+ nextBtn.textContent=oldText;
+}
+function reset(){state={answers:{},currentId:"q1",path:[]};clearSaved();show(landing);$("#resumeBtn").classList.add("hidden");}
+function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(function(){t.classList.add("hidden");},1800);}
+function copySummary(){
+ var st=result.dataset.stage||"",s=JSON.parse(result.dataset.scores||"{}");
+ var t="这份工作，还值得再待一年吗？\n我的阶段："+st+"\n当前回报 "+s.reward+"｜未来增值 "+s.growth+"｜可持续性 "+s.sustainability+"｜离开能力 "+s.exit;
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("结果摘要已复制");}).catch(function(){toast("复制失败，可以截图保存");});}else toast("可以截图保存结果");
+}
+
+$("#startBtn").addEventListener("click",function(){state={answers:{},currentId:"q1",path:[]};save();renderQuestion();});
+$("#resumeBtn").addEventListener("click",renderQuestion);
+nextBtn.addEventListener("click",goNext);backBtn.addEventListener("click",goBack);
+$("#restartBtn").addEventListener("click",reset);$("#copyBtn").addEventListener("click",copySummary);
+load();if(Object.keys(state.answers).length)$("#resumeBtn").classList.remove("hidden");
+})();
+</script>
+</body>
+</html>
