@@ -59,6 +59,12 @@ jobs:
               await options.first().click();
               const next=page.locator('#nextBtn');
               await next.waitFor({state:'visible'});
+              const nextText=(await next.innerText()).trim();
+              if(nextText==='查看结果'){
+                await next.evaluate(el=>el.click());
+                await page.locator('#result:not(.hidden)').waitFor({state:'visible',timeout:20000});
+                break;
+              }
               await next.click();
               if(await page.locator('#result:not(.hidden)').count()) break;
             }
