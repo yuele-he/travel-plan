@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=2'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=3'; then
               ok=1
               break
             fi
@@ -46,62 +46,88 @@ jobs:
           const URL='https://yuele-he.github.io/travel-plan/work-worth-test/?e2e='+Date.now();
           const browser=await chromium.launch();
 
+          async function answerCurrent(page, optionIndex=0){
+            const before=(await page.locator('#progressLabel').innerText()).trim();
+            const isMulti=await page.locator('#questionCard .multi-note').count()>0;
+            const option=page.locator('#questionCard .option').nth(optionIndex);
+            await option.waitFor({state:'visible'});
+            await option.click();
+
+            if(isMulti){
+              await page.waitForTimeout(380);
+              if(await page.locator('#result:not(.hidden)').count()) return;
+              const after=(await page.locator('#progressLabel').innerText()).trim();
+              if(after===before){
+                const next=page.locator('#nextBtn');
+                await next.waitFor({state:'visible'});
+                assert.ok((await next.innerText()).includes('继续')||(await next.innerText()).includes('结果'),'multi-select CTA');
+                await next.click();
+              }
+            }else{
+              await page.waitForFunction(
+                old=>document.querySelector('#result:not(.hidden)') || (document.querySelector('#progressLabel')?.textContent||'').trim()!==old,
+                before,
+                {timeout:3000}
+              );
+            }
+          }
+
           async function completeFlow(viewport,label){
             const context=await browser.newContext({viewport});
             const page=await context.newPage();
             await page.goto(URL,{waitUntil:'networkidle'});
             await page.click('#startBtn');
 
-            for(let i=0;i<40;i++){
+            if(label==='mobile'){
+              const firstBox=await page.locator('#questionCard .option').first().boundingBox();
+              assert.ok(firstBox&&firstBox.height>=52,'mobile option touch height');
+              assert.equal(await page.locator('.quiz-actions:not(.hidden)').count(),0,'single-select has no extra next button');
+            }
+
+            let multiSeen=0;
+            for(let i=0;i<45;i++){
               if(await page.locator('#result:not(.hidden)').count()) break;
-              const options=page.locator('#questionCard .option');
-              await options.first().waitFor({state:'visible'});
-              await options.first().click();
-              const next=page.locator('#nextBtn');
-              await next.waitFor({state:'visible'});
-              const nextText=(await next.innerText()).trim();
-              if(nextText==='查看结果'){
-                await next.evaluate(el=>el.click());
-                await page.locator('#result:not(.hidden)').waitFor({state:'visible',timeout:20000});
-                break;
-              }
-              await next.click();
-              if(await page.locator('#result:not(.hidden)').count()) break;
+              if(await page.locator('#questionCard .multi-note').count()) multiSeen++;
+              await answerCurrent(page,0);
             }
 
             await page.locator('#result:not(.hidden)').waitFor({state:'visible',timeout:20000});
             assert.equal(await page.locator('.score-card').count(),4,label+' score cards');
             assert.ok((await page.locator('.stage-title').innerText()).trim().length>0,label+' stage title');
+            assert.ok(multiSeen>=3,label+' encountered multi-select questions');
             const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
             assert.ok(overflow<=2,label+' horizontal overflow '+overflow);
             await context.close();
           }
 
           async function resumeAndEditFlow(){
-            const context=await browser.newContext({viewport:{width:1280,height:800}});
+            const context=await browser.newContext({viewport:{width:390,height:844}});
             const page=await context.newPage();
             await page.goto(URL,{waitUntil:'networkidle'});
             await page.evaluate(()=>localStorage.clear());
             await page.reload({waitUntil:'networkidle'});
             await page.click('#startBtn');
 
-            for(let i=0;i<2;i++){
-              await page.locator('#questionCard .option').first().click();
-              await page.click('#nextBtn');
-            }
+            await answerCurrent(page,0);
+            await answerCurrent(page,0);
+
             await page.reload({waitUntil:'networkidle'});
             await page.locator('#resumeBtn:not(.hidden)').waitFor({state:'visible'});
             await page.click('#resumeBtn');
             assert.ok((await page.locator('#progressLabel').innerText()).startsWith('3 /'),'resume at q3');
 
-            await page.locator('#questionCard .option').first().click();
-            await page.click('#nextBtn');
-            await page.locator('#questionCard .option').first().click();
-            await page.click('#nextBtn');
+            await answerCurrent(page,0);
+            await answerCurrent(page,0);
             await page.click('#backBtn');
             await page.click('#backBtn');
+
+            const before=(await page.locator('#progressLabel').innerText()).trim();
             await page.locator('#questionCard .option').nth(1).click();
-            await page.click('#nextBtn');
+            await page.waitForFunction(
+              old=>(document.querySelector('#progressLabel')?.textContent||'').trim()!==old,
+              before,
+              {timeout:3000}
+            );
             assert.equal(await page.locator('#questionCard .option.selected').count(),0,'downstream q4 answer cleared after q3 edit');
             await context.close();
           }
@@ -110,6 +136,6 @@ jobs:
           await completeFlow({width:390,height:844},'mobile');
           await resumeAndEditFlow();
           await browser.close();
-          console.log('ok: desktop + mobile + resume + edit downstream reset');
+          console.log('ok: mobile auto-advance + multi-select CTA + desktop/mobile + resume/edit reset');
           EOF
           node .work-worth-e2e.mjs
