@@ -1,0 +1,109 @@
+name: Work Worth browser E2E
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'work-worth-test/**'
+      - '.github/workflows/work-worth-e2e.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for GitHub Pages release
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://yuele-he.github.io/travel-plan/work-worth-test/?ci=$GITHUB_RUN_ID"
+          ok=0
+          for i in $(seq 1 40); do
+            body=$(curl -fsSL "$URL" || true)
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=2'; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = "1"
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Run desktop and mobile flows
+        shell: bash
+        run: |
+          cat > /tmp/work-worth-e2e.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import assert from 'node:assert/strict';
+
+          const URL='https://yuele-he.github.io/travel-plan/work-worth-test/?e2e='+Date.now();
+          const browser=await chromium.launch();
+
+          async function completeFlow(viewport,label){
+            const context=await browser.newContext({viewport});
+            const page=await context.newPage();
+            await page.goto(URL,{waitUntil:'networkidle'});
+            await page.click('#startBtn');
+
+            for(let i=0;i<40;i++){
+              if(await page.locator('#result:not(.hidden)').count()) break;
+              const options=page.locator('#questionCard .option');
+              await options.first().waitFor({state:'visible'});
+              await options.first().click();
+              const next=page.locator('#nextBtn');
+              await next.waitFor({state:'visible'});
+              await next.click();
+              if(await page.locator('#result:not(.hidden)').count()) break;
+            }
+
+            await page.locator('#result:not(.hidden)').waitFor({state:'visible',timeout:20000});
+            assert.equal(await page.locator('.score-card').count(),4,label+' score cards');
+            assert.ok((await page.locator('.stage-title').innerText()).trim().length>0,label+' stage title');
+            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+            assert.ok(overflow<=2,label+' horizontal overflow '+overflow);
+            await context.close();
+          }
+
+          async function resumeAndEditFlow(){
+            const context=await browser.newContext({viewport:{width:1280,height:800}});
+            const page=await context.newPage();
+            await page.goto(URL,{waitUntil:'networkidle'});
+            await page.evaluate(()=>localStorage.clear());
+            await page.reload({waitUntil:'networkidle'});
+            await page.click('#startBtn');
+
+            for(let i=0;i<2;i++){
+              await page.locator('#questionCard .option').first().click();
+              await page.click('#nextBtn');
+            }
+            await page.reload({waitUntil:'networkidle'});
+            await page.locator('#resumeBtn:not(.hidden)').waitFor({state:'visible'});
+            await page.click('#resumeBtn');
+            assert.ok((await page.locator('#progressLabel').innerText()).startsWith('3 /'),'resume at q3');
+
+            await page.locator('#questionCard .option').first().click();
+            await page.click('#nextBtn');
+            await page.locator('#questionCard .option').first().click();
+            await page.click('#nextBtn');
+            await page.click('#backBtn');
+            await page.click('#backBtn');
+            await page.locator('#questionCard .option').nth(1).click();
+            await page.click('#nextBtn');
+            assert.equal(await page.locator('#questionCard .option.selected').count(),0,'downstream q4 answer cleared after q3 edit');
+            await context.close();
+          }
+
+          await completeFlow({width:1280,height:800},'desktop');
+          await completeFlow({width:390,height:844},'mobile');
+          await resumeAndEditFlow();
+          await browser.close();
+          console.log('ok: desktop + mobile + resume + edit downstream reset');
+          EOF
+          node /tmp/work-worth-e2e.mjs
