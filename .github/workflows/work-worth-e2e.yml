@@ -47,7 +47,7 @@ jobs:
           const browser=await chromium.launch();
 
           async function answerCurrent(page, optionIndex=0){
-            const before=(await page.locator('#progressLabel').innerText()).trim();
+            const before=(await page.locator('#questionCard .q-title').innerText()).trim();
             const isMulti=await page.locator('#questionCard .multi-note').count()>0;
             const option=page.locator('#questionCard .option').nth(optionIndex);
             await option.waitFor({state:'visible'});
@@ -56,7 +56,7 @@ jobs:
             if(isMulti){
               await page.waitForTimeout(380);
               if(await page.locator('#result:not(.hidden)').count()) return;
-              const after=(await page.locator('#progressLabel').innerText()).trim();
+              const after=(await page.locator('#questionCard .q-title').innerText()).trim();
               if(after===before){
                 const next=page.locator('#nextBtn');
                 await next.waitFor({state:'visible'});
@@ -66,7 +66,7 @@ jobs:
                 await page.waitForTimeout(250);
                 const afterNext=await page.locator('#result:not(.hidden)').count()
                   ? 'RESULT'
-                  : (await page.locator('#progressLabel').innerText()).trim();
+                  : (await page.locator('#questionCard .q-title').innerText()).trim();
                 console.log('MULTI',before,'->',afterNext);
                 assert.notEqual(afterNext,before,'multi-select continue from '+before);
               }
@@ -130,10 +130,10 @@ jobs:
             await page.click('#backBtn');
             await page.click('#backBtn');
 
-            const before=(await page.locator('#progressLabel').innerText()).trim();
+            const before=(await page.locator('#questionCard .q-title').innerText()).trim();
             await page.locator('#questionCard .option').nth(1).click();
             await page.waitForFunction(
-              old=>(document.querySelector('#progressLabel')?.textContent||'').trim()!==old,
+              old=>(document.querySelector('#questionCard .q-title')?.textContent||'').trim()!==old,
               before,
               {timeout:3000}
             );
