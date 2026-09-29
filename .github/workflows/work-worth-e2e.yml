@@ -116,8 +116,8 @@ jobs:
               assert.equal(natural.w,900,'share image width');
               assert.equal(natural.h,1200,'share image height');
               assert.equal(await page.locator('script[data-qrcode-lib]').count(),0,'share card loads no QR library');
-              const source=await page.evaluate(()=>generateShareCard.toString());
-              assert.ok(!source.includes('扫码')&&!source.includes('QRCode')&&!source.includes('SHARE_URL'),'share card has no QR or test CTA');
+              const source=await page.content();
+              assert.ok(!source.includes('扫码测测你的工作')&&!source.includes('QRCode')&&!source.includes('SHARE_URL')&&!source.includes('二维码和网址'),'share card has no QR or test CTA');
               await page.locator('#shareCloseBtn').click();
             }
             assert.ok(multiSeen>=2,label+' encountered multi-select questions');
