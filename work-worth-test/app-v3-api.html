@@ -25,7 +25,19 @@ h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacin
 .boundary-note,.info-note,.risk-note{margin-top:14px;padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.65}.boundary-note{background:#f5eee7;color:#765940}.info-note{background:#edf3f0;color:#49645b}.risk-note{background:var(--warn-soft);color:#7d4939;border-left:4px solid var(--warn)}
 .score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}.score-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px}.score-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.score-name{font-size:14px;color:var(--muted)}.score-num{font-size:25px;font-weight:800}.score-track{height:8px;background:#ebe7df;border-radius:999px;overflow:hidden;margin-top:11px}.score-fill{height:100%;border-radius:999px;background:var(--accent)}.score-tag{font-size:12px;color:var(--muted);margin-top:8px}
 .section-card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:21px 19px;margin:12px 0}.section-card h2{font-size:21px;line-height:1.4;margin:0 0 12px}.section-card h3{font-size:17px;line-height:1.55;margin:18px 0 7px}.section-card p{font-size:16px;line-height:1.82;color:#444d48;margin:0 0 12px}.section-card p:last-child{margin-bottom:0}.callout{border-left:4px solid var(--accent);padding:12px 14px;background:#f2f6f4;border-radius:0 14px 14px 0;font-size:15px;line-height:1.75;color:#3f4944;margin-top:12px}.callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}.result-actions{padding:10px 0 20px}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1f2723;color:#fff;padding:11px 16px;border-radius:999px;font-size:13px;box-shadow:0 10px 24px rgba(0,0,0,.18);z-index:99}
-@media(max-width:560px){.app-shell{padding:14px 14px 34px}.feature-grid{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:112px 1fr;align-items:center}.feature b{margin:0}.question-card{padding:22px 17px;min-height:420px}.q-title{font-size:23px}.stage-title{font-size:34px}}
+@media(max-width:560px){
+.app-shell{padding:10px 12px calc(24px + env(safe-area-inset-bottom))}
+.feature-grid{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:112px 1fr;align-items:center}.feature b{margin:0}
+.quiz-header{padding:8px 0 12px}.icon-btn{width:44px;height:44px;flex:0 0 44px}
+.question-card{padding:20px 15px;min-height:0;border-radius:20px}
+.q-title{font-size:22px;line-height:1.4}.q-help{font-size:14px;margin-bottom:16px}
+.options{gap:9px}.option{min-height:54px;padding:14px 14px;align-items:center;font-size:16px;line-height:1.45;border-radius:14px}
+.option-dot{margin-top:0;width:22px;height:22px}
+.multi-note{font-size:13px;margin-bottom:10px}
+.quiz-actions{position:sticky;bottom:0;z-index:6;padding:12px 0 calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(246,243,236,0),var(--bg) 24%,var(--bg))}
+.quiz-actions .primary-btn{min-height:52px;border-radius:15px}
+.stage-title{font-size:34px}
+}
 @media(max-width:360px){.score-grid{grid-template-columns:1fr}.q-title{font-size:22px}}
 </style>
 </head>
@@ -65,8 +77,10 @@ h1{font-size:clamp(38px,9vw,64px);line-height:1.12;margin:0 0 22px;letter-spacin
 (function(){
 "use strict";
 var $=function(s){return document.querySelector(s);};
-var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#resultContent"),card=$("#questionCard"),nextBtn=$("#nextBtn"),backBtn=$("#backBtn");
+var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#resultContent"),card=$("#questionCard"),nextBtn=$("#nextBtn"),backBtn=$("#backBtn"),quizActions=document.querySelector(".quiz-actions");
 var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
+var autoAdvanceTimer=null;
+function cancelAutoAdvance(){if(autoAdvanceTimer){clearTimeout(autoAdvanceTimer);autoAdvanceTimer=null;}}
 var STORAGE="workWorthApiV3";
 var state={answers:{},currentId:"q1",path:[]};
 
@@ -156,6 +170,7 @@ function show(screen){[landing,quiz,result].forEach(function(x){x.classList.add(
 
 function hasAnswer(q){var a=state.answers[q.id];return q.type==="multi"?Array.isArray(a)&&a.length>0:a!==undefined&&a!==null&&a!=="";}
 function choose(q,value){
+ cancelAutoAdvance();
  var before=JSON.stringify(state.answers[q.id]);
  if(q.type==="multi"){
    var arr=Array.isArray(state.answers[q.id])?state.answers[q.id].slice():[];
@@ -164,11 +179,23 @@ function choose(q,value){
    else{arr=arr.filter(function(x){return exclusive.indexOf(x)<0;});arr=arr.indexOf(value)>=0?arr.filter(function(x){return x!==value;}):arr.concat([value]);}
    state.answers[q.id]=arr;
  }else state.answers[q.id]=value;
- if(before!==JSON.stringify(state.answers[q.id])){
+ var changed=before!==JSON.stringify(state.answers[q.id]);
+ if(changed){
    var qi=questions.findIndex(function(x){return x.id===q.id;});
    for(var i=qi+1;i<questions.length;i++)delete state.answers[questions[i].id];
  }
  renderQuestion();
+ if(!changed)return;
+ var exclusiveSelected=q.type==="multi"&&(q.exclusive||[]).indexOf(value)>=0&&Array.isArray(state.answers[q.id])&&state.answers[q.id].length===1&&state.answers[q.id][0]===value;
+ if(q.type!=="multi"||exclusiveSelected){
+   autoAdvanceTimer=setTimeout(function(){
+     autoAdvanceTimer=null;
+     if(state.currentId!==q.id)return;
+     var a=state.answers[q.id];
+     var stillSelected=q.type==="multi"?(Array.isArray(a)&&a.length===1&&a[0]===value):a===value;
+     if(stillSelected)goNext();
+   },320);
+ }
 }
 function renderQuestion(){
  show(quiz);
@@ -179,13 +206,13 @@ function renderQuestion(){
  progressLabel.textContent=(idx+1)+" / "+visible.length;progressText.textContent=q.section;
  backBtn.style.visibility=state.path.length?"visible":"hidden";
  var answer=state.answers[q.id],multi=q.type==="multi",html='<div class="q-kicker">'+escapeHtml(q.section)+'</div><h2 class="q-title">'+escapeHtml(titleOf(q))+'</h2>';
- var h=helpOf(q);if(h)html+='<p class="q-help">'+escapeHtml(h)+'</p>';if(multi)html+='<p class="multi-note">可多选</p>';html+='<div class="options">';
+ var h=helpOf(q);if(h)html+='<p class="q-help">'+escapeHtml(h)+'</p>';if(multi)html+='<p class="multi-note">可多选，选完点继续</p>';html+='<div class="options">';
  optionsOf(q).forEach(function(o){var selected=multi?(Array.isArray(answer)&&answer.indexOf(o.value)>=0):answer===o.value;html+='<button class="option '+(multi?"checkbox ":"")+(selected?"selected":"")+'" data-value="'+escapeHtml(o.value)+'"><span class="option-dot">'+(selected?"✓":"")+'</span><span>'+escapeHtml(o.label)+'</span></button>';});
  html+="</div>";card.innerHTML=html;card.querySelectorAll(".option").forEach(function(btn){btn.addEventListener("click",function(){choose(q,btn.dataset.value);});});
- nextBtn.disabled=!hasAnswer(q);nextBtn.textContent=idx===visible.length-1?"查看结果":"下一题";save();
+ if(multi){quizActions.classList.remove("hidden");nextBtn.disabled=!hasAnswer(q);nextBtn.textContent=idx===visible.length-1?"查看结果":"选好了，继续";}else{quizActions.classList.add("hidden");nextBtn.disabled=false;}save();
 }
-function goNext(){var q=getQ(state.currentId);if(!q||!hasAnswer(q))return;var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});if(idx===visible.length-1){finish();return;}state.path.push(q.id);state.currentId=visible[idx+1].id;save();renderQuestion();}
-function goBack(){if(!state.path.length)return;state.currentId=state.path.pop();save();renderQuestion();}
+function goNext(){cancelAutoAdvance();var q=getQ(state.currentId);if(!q||!hasAnswer(q))return;var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});if(idx===visible.length-1){finish();return;}state.path.push(q.id);state.currentId=visible[idx+1].id;save();renderQuestion();}
+function goBack(){cancelAutoAdvance();if(!state.path.length)return;state.currentId=state.path.pop();save();renderQuestion();}
 
 
 var API_BASE="https://work-worth-test-api-production.up.railway.app";
@@ -277,7 +304,7 @@ async function finish(){
  }
  nextBtn.textContent=oldText;
 }
-function reset(){state={answers:{},currentId:"q1",path:[]};clearSaved();show(landing);$("#resumeBtn").classList.add("hidden");}
+function reset(){cancelAutoAdvance();state={answers:{},currentId:"q1",path:[]};clearSaved();show(landing);$("#resumeBtn").classList.add("hidden");}
 function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(function(){t.classList.add("hidden");},1800);}
 function copySummary(){
  var st=result.dataset.stage||"",s=JSON.parse(result.dataset.scores||"{}");
@@ -285,7 +312,7 @@ function copySummary(){
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("结果摘要已复制");}).catch(function(){toast("复制失败，可以截图保存");});}else toast("可以截图保存结果");
 }
 
-$("#startBtn").addEventListener("click",function(){state={answers:{},currentId:"q1",path:[]};save();renderQuestion();});
+$("#startBtn").addEventListener("click",function(){cancelAutoAdvance();state={answers:{},currentId:"q1",path:[]};save();renderQuestion();});
 $("#resumeBtn").addEventListener("click",renderQuestion);
 nextBtn.addEventListener("click",goNext);backBtn.addEventListener("click",goBack);
 $("#restartBtn").addEventListener("click",reset);$("#copyBtn").addEventListener("click",copySummary);
