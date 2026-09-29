@@ -85,7 +85,7 @@ var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#
 var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
 var autoAdvanceTimer=null;
 function cancelAutoAdvance(){if(autoAdvanceTimer){clearTimeout(autoAdvanceTimer);autoAdvanceTimer=null;}}
-var STORAGE="workWorthApiV4";
+var STORAGE="workWorthApiV5";
 var state={answers:{},currentId:"q1",path:[]};
 var lastShareBlob=null,lastShareUrl="";
 var SHARE_URL="https://yuele-he.github.io/travel-plan/work-worth-test/";
@@ -116,6 +116,9 @@ function q10Title(){return isShortTenure()?"按目前公司的制度和实际情
 function q11Title(){var base=["commission","project"].indexOf(state.answers.q2)>=0?"先不算特别高或特别低的偶发月份，和之前相比，你现在大多数月份通常能拿到的收入变化了多少？":"和之前相比，你现在每月比较稳定能拿到的收入变化了多少？";return isShortTenure()?base.replace("和之前相比","和刚进入目前岗位时相比"):base.replace("和之前相比","和大约一年前相比");}
 function q4Title(){var t=state.answers.q2;if(t==="commission")return "过去6个月，你平均每月实际拿到的总收入大约是多少？";if(t==="hourly")return "过去3个月，你平均每月实际拿到的收入大约是多少？";if(t==="project")return "过去6个月，你平均每月实际收到的项目或客户收入大约是多少？";return "每月比较稳定能拿到多少收入？";}
 function q6Title(){return state.answers.q2==="project"?"以你现在的工作量和经验来看，你的收入或收费水平在类似同行中大概在哪？":"和同城市、经验相近、职责相似的岗位相比，你现在的总收入大概在哪？";}
+function q13Title(){return isShortTenure()?"进入目前岗位以来，你完成了多少项以后换工作时也值得讲的完整工作成果？":"过去12个月，你完成了多少项以后换工作时也值得讲的完整工作成果？";}
+function q14Title(){return isShortTenure()?"进入目前岗位以来，你有没有能比较清楚证明自己工作价值的结果？":"过去12个月，你有没有能比较清楚证明自己工作价值的结果？";}
+function q15Title(){return isShortTenure()?"进入目前岗位以来，你承担工作的责任和影响范围发生了多大变化？":"和大约一年前相比，你现在承担工作的责任和影响范围发生了多大变化？";}
 function q13Help(){return (workExamples[state.answers.q1]||workExamples.other).out+" 一项完整成果最好能说清：背景、你负责什么、最后交付了什么。";}
 function q14Help(){return (workExamples[state.answers.q1]||workExamples.other).proof+" 不一定必须是数字，但要能说明你的贡献和最后发生的变化。";}
 function q22Title(){return state.answers.q2==="project"?"过去6个月，你对新的客户或项目机会验证到哪一步？":"过去6个月，你对外部工作机会验证到哪一步？";}
@@ -133,7 +136,6 @@ var questions=[
 {id:"q2",section:"基础信息",title:"你的收入主要怎么计算？",type:"single",options:function(){return [opt("fixed","固定月薪为主"),opt("bonus","固定工资 + 较明显奖金 / 绩效"),opt("commission","底薪 + 提成 / 佣金"),opt("hourly","按工时 / 班次计薪"),opt("project","按项目 / 订单 / 客户结算")];}},
 {id:"q3",section:"基础信息",title:"你在目前这份主要岗位 / 工作内容里做多久了？",help:"如果最近在同一家公司明显换岗，按现在主要做的工作计算。",type:"single",options:function(){return [opt("lt3","不足3个月"),opt("3to6","3–6个月"),opt("6to12","6–12个月"),opt("1to2","1–2年"),opt("2to5","2–5年"),opt("5plus","5年以上")];}},
 {id:"q4",section:"当前回报",title:q4Title,help:"优先按实际拿到手、你自己最熟悉的口径来选；后面会单独比较市场位置。",type:"single",options:function(){return [opt("lt5","5000元以下"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30to50","3–5万元"),opt("50plus","5万元以上")];}},
-{id:"q5",section:"当前回报",title:"过去12个月，你实际拿到的奖金、绩效或其他额外收入，大约相当于几个月固定月收入？",help:"只算已经实际拿到、已经归属、可以使用的收入。未来奖金和未归属股权先不算。",type:"single",showIf:function(a){return a.q2==="fixed"||a.q2==="bonus";},options:function(){return [opt("0","没有"),opt("lt0.5","不到0.5个月"),opt("0.5to1","0.5–1个月"),opt("1to2","1–2个月"),opt("2to4","2–4个月"),opt("4plus","4个月以上")];}},
 {id:"q6",section:"当前回报",title:q6Title,help:"尽量参考最近的真实岗位、猎头沟通、面试、offer或同行信息。不知道就直接选“不清楚”。",type:"single",options:function(){return [opt("low20","明显偏低，约低20%以上"),opt("low10","略低，约低10%–20%"),opt("same","大致相当，约±10%"),opt("high10","略高，约高10%–20%"),opt("high20","明显偏高，高20%以上"),opt("unknown","不清楚 / 最近没认真比较")];}},
 {id:"q7",section:"当前回报",title:"过去4周，平均每周有多少天需要工作？",help:"半天可以按0.5天算；偶尔只看一条消息不算完整工作日。",type:"single",options:function(){return [opt("3","3天及以下"),opt("4","4天"),opt("5","5天"),opt("5.5","约5.5天"),opt("6","6天"),opt("6.5","约6.5天"),opt("7","7天")];}},
 {id:"q8",section:"当前回报",title:"一个普通工作日，你通常实际工作多久？",help:"不算通勤和正常午休；如果晚上碎片化处理工作已经是日常，也算进当天总时间。",type:"single",options:function(){return [opt("7.5","8小时以内"),opt("8","约8小时"),opt("9","约9小时"),opt("10","约10小时"),opt("11","约11小时"),opt("12","12小时以上")];}},
@@ -141,15 +143,15 @@ var questions=[
 {id:"q10",section:"当前回报",title:q10Title,help:"包括实际能用的年假、调休或可自行安排的完整休息日；不算正常周末、法定节假日和病假。当天仍工作较长时间就不算完整休息。",type:"single",options:function(){return [opt("0to3","0–3天"),opt("4to7","4–7天"),opt("8to10","8–10天"),opt("11to15","11–15天"),opt("16to20","16–20天"),opt("20plus","20天以上")];}},
 {id:"q11",section:"未来增值",title:q11Title,type:"single",options:function(){return [opt("down","下降"),opt("same","基本没变"),opt("lt1","增加不到1000元"),opt("1to3","增加1000–3000元"),opt("3to5","增加3000–5000元"),opt("5plus","增加5000元以上"),opt("na","时间太短 / 很难比较")];}},
 {id:"q12",section:"未来增值",title:"过去12个月，你的正式职位或职级有变化吗？",help:"这里只看正式职位或职级；实际责任有没有变大，下一题会另外问。任职不足一年按入职以来回答。",type:"single",options:function(){return [opt("none","没有变化"),opt("title","主要是title变化，级别基本没变"),opt("level","明确晋升一级"),opt("major","明显进入更高一级岗位 / 层级"),opt("nohierarchy","没有明确职级体系"),opt("short","任职时间太短，不适合判断")];}},
-{id:"q13",section:"未来增值",title:"过去12个月，你完成了多少项以后换工作时也值得讲的完整工作成果？",help:q13Help,type:"single",options:function(){return [opt("none","基本没有"),opt("one","1项"),opt("two3","2–3项"),opt("fourplus","4项以上"),opt("long","一个重要长期项目仍在进行，还没完整结束")];}},
-{id:"q14",section:"未来增值",title:"过去12个月，你有没有能比较清楚证明自己工作价值的结果？",help:q14Help,type:"single",options:function(){return [opt("none","基本没有"),opt("vague","有一些，但比较模糊"),opt("tooSoon","成果刚完成，还没来得及验证结果"),opt("one","有1项比较明确的结果"),opt("two3","有2–3项明确结果"),opt("strong","有多项明确结果，或1项影响很大的结果")];}},
-{id:"q15",section:"未来增值",title:"过去12个月，你新增的最高责任层级更接近哪一种？",help:"只看过去一年新增加、并且已经稳定承担的部分。原本就有的职责不重复计分。",type:"single",options:function(){return [opt("none","没有明显新增责任"),opt("independent","开始独立负责完整工作"),opt("judgment","开始自己做方案、判断、处理复杂问题"),opt("scope","原责任层级相近，但负责的业务、客户、预算、项目或团队范围明显扩大"),opt("coordinate","开始协调、指导或审核别人"),opt("outcome","开始对更大的项目、指标或团队结果负责")];}},
+{id:"q13",section:"未来增值",title:q13Title,help:q13Help,type:"single",options:function(){return [opt("none","基本没有"),opt("one","1项"),opt("two3","2–3项"),opt("fourplus","4项以上"),opt("long","一个重要长期项目仍在进行，还没完整结束")];}},
+{id:"q14",section:"未来增值",title:q14Title,help:q14Help,type:"single",options:function(){return [opt("none","基本没有"),opt("vague","有一些，但比较模糊"),opt("tooSoon","成果刚完成，还没来得及验证结果"),opt("one","有1项比较明确的结果"),opt("two3","有2–3项明确结果"),opt("strong","有多项明确结果，或1项影响很大的结果")];}},
+{id:"q15",section:"未来增值",title:q15Title,help:"这里只看责任、复杂度、决定权、影响范围和结果责任是否扩大；是否带人不是唯一的责任升级标准。",type:"single",options:function(){return [opt("none","责任和影响范围基本没变"),opt("independent","开始能独立完成完整工作"),opt("complex","开始独立处理更复杂的问题和重要判断"),opt("broader","开始对更大的业务、客户或项目范围负责"),opt("outcome","开始直接为更大的最终结果负责")];}},
 {id:"q16",section:"可持续性",title:"过去4周，有多少个工作日，你实际工作时间比平时明显更长？",help:"大约比你自己的普通工作日多2小时以上。这里看异常延长，不用拿自己和别人比。",type:"single",options:function(){return [opt("0","0天"),opt("1to2","1–2天"),opt("3to5","3–5天"),opt("6to10","6–10天"),opt("11plus","11天以上")];}},
 {id:"q17",section:"可持续性",title:"过去4周，下班后或休息日，你平均每周有多少次需要继续处理工作？",help:"只算因为工作需要必须处理。你主动把弹性工作安排到晚上，不自动算侵入。",type:"single",options:function(){return [opt("0","基本没有"),opt("1","每周约1次"),opt("2to3","每周2–3次"),opt("4to5","每周4–5次"),opt("daily","几乎每天")];}},
 {id:"q18",section:"可持续性",title:"过去3个月，有多少次已经安排好的私人计划，因为工作被迫取消、明显推迟或大幅缩短？",type:"single",options:function(){return [opt("0","0次"),opt("1to2","1–2次"),opt("3to5","3–5次"),opt("6to10","6–10次"),opt("10plus","10次以上"),opt("unknown","平时很少安排私人计划，不好判断")];}},
 {id:"q18a",section:"可持续性",title:"过去4周，领导、同事或其他工作关系本身，给你的压力有多大？",help:"这里只看人际关系带来的额外消耗，不把正常工作量重复算进去。",type:"single",options:function(){return [opt("none","几乎没有，整体相处正常"),opt("small","偶尔有摩擦，但很快能过去"),opt("regular","经常需要忍着、提防，或者沟通本身很累"),opt("spill","已经明显影响我的情绪或下班后的状态"),opt("severe","经常出现针对、羞辱、排挤、甩锅或明显不公平对待")];}},
 {id:"q18b",section:"可持续性",title:"这种人际压力主要来自哪里？",type:"single",showIf:function(a){return ["regular","spill","severe"].indexOf(a.q18a)>=0;},options:function(){return [opt("manager","直属领导"),opt("peers","同事 / 团队成员"),opt("external","跨部门、客户或合作方"),opt("multiple","好几方面都有"),opt("climate","很难说是哪一个人，主要是整个氛围")];}},
-{id:"q18c",section:"可持续性",title:"过去6个月，重要的分工、绩效评价、奖金或晋升规则，整体有多公平、可预期？",help:"不是问每次结果都合不合你心意，而是规则是否相对稳定、解释得通。",type:"single",options:function(){return [opt("clear","大体公平，而且规则比较清楚"),opt("mostly","偶尔不一致，但总体还能预期"),opt("mixed","有时公平，有时说不准"),opt("unfair","经常觉得分配或评价不太公平"),opt("arbitrary","规则经常变化，结果也很难靠正常表现解释")];}},
+{id:"q18c",section:"可持续性",title:"过去6个月，重要的分工、绩效、奖金或晋升规则有多清楚、稳定、可预期？",help:"这里只看规则本身是否清楚、稳定、能提前判断，不评价某一次结果对你是否公平。",type:"single",options:function(){return [opt("clear","规则清楚、稳定，基本能提前预期"),opt("mostly","偶尔调整，但总体仍能预期"),opt("mixed","有些规则清楚，有些经常说不准"),opt("unstable","重要规则经常变化，很难提前判断"),opt("arbitrary","规则变化很大，结果经常难以提前判断")];}},
 {id:"q18d",section:"可持续性",title:"你现在有多常遇到：要为结果负责，但职责、优先级或决定权并不清楚？",help:"比如任务反复变化、多人给出冲突要求，或者需要承担结果却没有相应决定权。",type:"single",options:function(){return [opt("rare","几乎没有"),opt("occasional","偶尔有，但通常能解决"),opt("regular","比较常见，需要反复确认或协调"),opt("frequent","经常发生，容易返工或承担不清楚的责任"),opt("constant","几乎一直如此，责任和权限明显不匹配")];}},
 {id:"q19",section:"离开能力",title:"如果从下个月开始暂时没有工作收入，每月最低需要多少钱维持正常生活？",help:"算房租/房贷、吃饭、交通、保险、必要债务和必要家庭支出；先不算旅游、投资和非必要购物。",type:"single",options:function(){return [opt("lt3","3000元以下"),opt("3to5","3000–5000元"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30plus","3万元以上")];}},
 {id:"q20",section:"离开能力",title:"如果暂时没有工作收入，目前有多少资金是真正可以拿来维持生活的？",help:"算现金、存款和容易变现且你愿意使用的资产；不算房子、车、未归属股权或你明确不会动用的钱。",type:"single",options:function(){return [opt("lt10","1万元以下"),opt("10to30","1–3万元"),opt("30to50","3–5万元"),opt("50to100","5–10万元"),opt("100to200","10–20万元"),opt("200to500","20–50万元"),opt("500to1000","50–100万元"),opt("1000plus","100万元以上")];}},
@@ -253,12 +255,17 @@ async function requestResult(){
 function renderApiResult(data){
  var s=data.scores,stage=data.stage,c=data.content||{},risk=data.risk||{level:"none"},waiting=data.waiting||{level:"none"};
  var reasons=c.reasons||{},notes=c.confidence_notes||[];
- var html='<section class="result-hero"><div class="result-label">你的结果</div><h1 class="stage-title">'+escapeHtml(stage.display_name||stage.name)+'</h1>';
- if(stage.observe)html+='<p class="stage-summary"><strong>根据目前有限信息，你暂时更接近「'+escapeHtml(stage.name)+'」</strong></p>';
- else html+='<p class="stage-summary"><strong>'+escapeHtml(stage.labels||"")+'</strong></p>';
- html+='<p class="stage-summary">'+escapeHtml(c.intro||"")+'</p>';
-
- if(risk.level==="high"&&c.risk)html+='<div class="risk-note">'+escapeHtml(c.risk)+'</div>';
+ var highRisk=risk.level==="high";
+ var heroTitle=highRisk?"先处理现实风险":(stage.display_name||stage.name);
+ var html='<section class="result-hero"><div class="result-label">你的结果</div><h1 class="stage-title">'+escapeHtml(heroTitle)+'</h1>';
+ if(highRisk){
+  html+='<p class="stage-summary"><strong>如果暂时不考虑这项结构性风险，你的基础工作状态更接近「'+escapeHtml(stage.name)+'」。</strong></p>';
+  if(c.risk)html+='<div class="risk-note">'+escapeHtml(c.risk)+'</div>';
+ }else{
+  if(stage.observe)html+='<p class="stage-summary"><strong>根据目前有限信息，你暂时更接近「'+escapeHtml(stage.name)+'」</strong></p>';
+  else html+='<p class="stage-summary"><strong>'+escapeHtml(stage.labels||"")+'</strong></p>';
+  html+='<p class="stage-summary">'+escapeHtml(c.intro||"")+'</p>';
+ }
  if(c.workplace)html+='<div class="'+((data.workplace&&data.workplace.level==="high")?"risk-note":"info-note")+'">'+escapeHtml(c.workplace)+'</div>';
 
  if(stage.adjacent){
@@ -280,7 +287,9 @@ function renderApiResult(data){
  html+='<h3>💰 当前回报 '+s.reward+'｜'+escapeHtml(data.dimensions.reward.label)+'</h3><p>'+escapeHtml(reasons.reward||"")+'</p>';
  html+='<h3>📈 未来增值 '+s.growth+'｜'+escapeHtml(data.dimensions.growth.label)+'</h3><p>'+escapeHtml(reasons.growth||"")+'</p>';
  html+='<h3>🔋 可持续性 '+s.sustainability+'｜'+escapeHtml(data.dimensions.sustainability.label)+'</h3><p>'+escapeHtml(reasons.sustainability||"")+'</p>';
- html+='<h3>🚪 离开能力 '+s.exit+'｜'+escapeHtml(data.dimensions.exit.label)+'</h3><p>'+escapeHtml(reasons.exit||"")+'</p></section>';
+ html+='<h3>🚪 离开能力 '+s.exit+'｜'+escapeHtml(data.dimensions.exit.label)+'</h3><p>'+escapeHtml(reasons.exit||"")+'</p>';
+ if(c.external_opportunity)html+='<div class="info-note">'+escapeHtml(c.external_opportunity)+'</div>';
+ html+='</section>';
 
  if(c.risk||c.waiting){
   html+='<section class="section-card"><h2>现在还有两个变量值得单独看</h2>';
@@ -296,9 +305,9 @@ function renderApiResult(data){
  html+='<section class="section-card"><p><strong>这只是你现在的工作状态，不是长期标签。</strong> 真正值得判断的，是你现在付出的时间、精力和机会成本，究竟换回了什么；以及下一次复盘时，你会不会比今天拥有更多筹码和更多选择。</p></section>';
 
  resultContent.innerHTML=html;
- result.dataset.stage=stage.observe?"观察期（接近"+stage.name+"）":stage.name;
+ result.dataset.stage=highRisk?"先处理现实风险":(stage.observe?"观察期（接近"+stage.name+"）":stage.name);
  result.dataset.scores=JSON.stringify(s);
- result.dataset.labels=stage.labels||"";
+ result.dataset.labels=highRisk?("基础状态："+stage.name):(stage.labels||"");
 }
 
 function renderLoadingResult(){

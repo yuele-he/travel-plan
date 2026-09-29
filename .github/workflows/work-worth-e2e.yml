@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=7'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=8'; then
               ok=1
               break
             fi
@@ -104,6 +104,7 @@ jobs:
             await page.locator('.score-card').first().waitFor({state:'visible',timeout:20000});
             assert.equal(await page.locator('.score-card').count(),4,label+' score cards');
             assert.ok((await page.locator('.stage-title').innerText()).trim().length>0,label+' stage title');
+            assert.equal((await page.locator('.stage-title').innerText()).trim(),'先处理现实风险',label+' high-risk hero priority');
             if(label==='mobile'){
               await page.locator('#shareCardBtn').click();
               await page.locator('#shareModal:not(.hidden)').waitFor({state:'visible',timeout:10000});
