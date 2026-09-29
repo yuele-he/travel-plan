@@ -156,6 +156,7 @@ function show(screen){[landing,quiz,result].forEach(function(x){x.classList.add(
 
 function hasAnswer(q){var a=state.answers[q.id];return q.type==="multi"?Array.isArray(a)&&a.length>0:a!==undefined&&a!==null&&a!=="";}
 function choose(q,value){
+ var before=JSON.stringify(state.answers[q.id]);
  if(q.type==="multi"){
    var arr=Array.isArray(state.answers[q.id])?state.answers[q.id].slice():[];
    var exclusive=q.exclusive||[];
@@ -163,6 +164,10 @@ function choose(q,value){
    else{arr=arr.filter(function(x){return exclusive.indexOf(x)<0;});arr=arr.indexOf(value)>=0?arr.filter(function(x){return x!==value;}):arr.concat([value]);}
    state.answers[q.id]=arr;
  }else state.answers[q.id]=value;
+ if(before!==JSON.stringify(state.answers[q.id])){
+   var qi=questions.findIndex(function(x){return x.id===q.id;});
+   for(var i=qi+1;i<questions.length;i++)delete state.answers[questions[i].id];
+ }
  renderQuestion();
 }
 function renderQuestion(){
