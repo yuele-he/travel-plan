@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=8'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=9'; then
               ok=1
               break
             fi
@@ -93,10 +93,12 @@ jobs:
               assert.equal(await page.locator('.quiz-actions:not(.hidden)').count(),0,'single-select has no extra next button');
             }
 
-            let multiSeen=0;
+            let multiSeen=0,waitingHorizonSeen=false;
             for(let i=0;i<45;i++){
               if(await page.locator('#result:not(.hidden)').count()) break;
               if(await page.locator('#questionCard .multi-note').count()) multiSeen++;
+              const currentTitle=(await page.locator('#questionCard .q-title').innerText()).trim();
+              if(currentTitle.includes('距离现在大约还有多久')) waitingHorizonSeen=true;
               await answerCurrent(page,0);
             }
 
@@ -115,7 +117,8 @@ jobs:
               assert.equal(natural.h,1200,'share image height');
               await page.locator('#shareCloseBtn').click();
             }
-            assert.ok(multiSeen>=3,label+' encountered multi-select questions');
+            assert.ok(multiSeen>=2,label+' encountered multi-select questions');
+            assert.ok(waitingHorizonSeen,label+' encountered waiting horizon question');
             const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
             assert.ok(overflow<=2,label+' horizontal overflow '+overflow);
             await context.close();

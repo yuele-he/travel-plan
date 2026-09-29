@@ -85,7 +85,7 @@ var landing=$("#landing"),quiz=$("#quiz"),result=$("#result"),resultContent=$("#
 var progressBar=$("#progressBar"),progressLabel=$("#progressLabel"),progressText=$("#progressText");
 var autoAdvanceTimer=null;
 function cancelAutoAdvance(){if(autoAdvanceTimer){clearTimeout(autoAdvanceTimer);autoAdvanceTimer=null;}}
-var STORAGE="workWorthApiV5";
+var STORAGE="workWorthApiV6";
 var state={answers:{},currentId:"q1",path:[]};
 var lastShareBlob=null,lastShareUrl="";
 var SHARE_URL="https://yuele-he.github.io/travel-plan/work-worth-test/";
@@ -135,7 +135,7 @@ var questions=[
 {id:"q1",section:"基础信息",title:"你现在主要做哪类工作？",help:"选最接近你日常核心工作的那一类。",type:"single",options:function(){return Object.keys(workTypes).map(function(k){return opt(k,workTypes[k]);});}},
 {id:"q2",section:"基础信息",title:"你的收入主要怎么计算？",type:"single",options:function(){return [opt("fixed","固定月薪为主"),opt("bonus","固定工资 + 较明显奖金 / 绩效"),opt("commission","底薪 + 提成 / 佣金"),opt("hourly","按工时 / 班次计薪"),opt("project","按项目 / 订单 / 客户结算")];}},
 {id:"q3",section:"基础信息",title:"你在目前这份主要岗位 / 工作内容里做多久了？",help:"如果最近在同一家公司明显换岗，按现在主要做的工作计算。",type:"single",options:function(){return [opt("lt3","不足3个月"),opt("3to6","3–6个月"),opt("6to12","6–12个月"),opt("1to2","1–2年"),opt("2to5","2–5年"),opt("5plus","5年以上")];}},
-{id:"q4",section:"当前回报",title:q4Title,help:"优先按实际拿到手、你自己最熟悉的口径来选；后面会单独比较市场位置。",type:"single",options:function(){return [opt("lt5","5000元以下"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30to50","3–5万元"),opt("50plus","5万元以上")];}},
+{id:"q4",section:"当前回报",title:q4Title,help:"优先按实际拿到手、你自己最熟悉的口径来选；后面会单独比较市场位置。",type:"single",options:function(){return [opt("lt5","5000元以下"),opt("5to8","5000–8000元"),opt("8to12","8000–1.2万元"),opt("12to20","1.2–2万元"),opt("20to30","2–3万元"),opt("30to50","3–5万元"),opt("50to80","5–8万元"),opt("80to120","8–12万元"),opt("120plus","12万元以上")];}},
 {id:"q6",section:"当前回报",title:q6Title,help:"尽量参考最近的真实岗位、猎头沟通、面试、offer或同行信息。不知道就直接选“不清楚”。",type:"single",options:function(){return [opt("low20","明显偏低，约低20%以上"),opt("low10","略低，约低10%–20%"),opt("same","大致相当，约±10%"),opt("high10","略高，约高10%–20%"),opt("high20","明显偏高，高20%以上"),opt("unknown","不清楚 / 最近没认真比较")];}},
 {id:"q7",section:"当前回报",title:"过去4周，平均每周有多少天需要工作？",help:"半天可以按0.5天算；偶尔只看一条消息不算完整工作日。",type:"single",options:function(){return [opt("3","3天及以下"),opt("4","4天"),opt("5","5天"),opt("5.5","约5.5天"),opt("6","6天"),opt("6.5","约6.5天"),opt("7","7天")];}},
 {id:"q8",section:"当前回报",title:"一个普通工作日，你通常实际工作多久？",help:"不算通勤和正常午休；如果晚上碎片化处理工作已经是日常，也算进当天总时间。",type:"single",options:function(){return [opt("7.5","8小时以内"),opt("8","约8小时"),opt("9","约9小时"),opt("10","约10小时"),opt("11","约11小时"),opt("12","12小时以上")];}},
@@ -161,8 +161,9 @@ var questions=[
 {id:"q22a",section:"离开能力",title:"目前了解到的外部机会，实际可能给你的总收入和现在相比大概怎么样？",help:"尽量参考招聘方沟通、谈薪或真实offer；只有职位页面上的数字可以选“不清楚”。",type:"single",showIf:function(a){return ["interview","final","offer","talk","quote","signed"].indexOf(a.q22)>=0;},options:function(){return [opt("lower","低10%以上"),opt("same","大致±10%"),opt("lt10","高不到10%"),opt("10to30","高10%–30%"),opt("30plus","高30%以上"),opt("unknown","还不清楚 / 没谈到")];}},
 {id:"q22b",section:"离开能力",title:"这个已经比较明确的机会，现实中你会认真考虑，而且条件允许入职 / 合作吗？",help:"这里同时考虑地点、方向、合同、身份等现实条件。",type:"single",showIf:function(a){return a.q22==="offer"||a.q22==="signed";},options:function(){return [opt("yes","会，而且现实中可以执行"),opt("maybe","有可能，但还有明显条件没解决"),opt("no","基本不会考虑 / 现实中不可执行")];}},
 {id:"q23",section:"你的优先级",title:"如果接下来6–12个月只能优先改善一件事，你最希望是什么？",type:"single",options:function(){return [opt("income","收入更高"),opt("growth","学到更多 / 获得更有价值的工作"),opt("life","少工作一点，有更多私人时间"),opt("stability","更稳定、风险更低"),opt("location","地点 / 通勤 / 家庭安排更合适"),opt("satisfied","目前整体满意，没有特别想改变")];}},
-{id:"q24",section:"补充判断",title:"未来6–12个月，你有没有一个比较明确、值得等的节点？",help:"可多选。只选时间和条件相对清楚、而且真的会增加收入、履历或选择权的节点。",type:"multi",exclusive:["none","vague"],options:function(){return [opt("promotion","晋升 / 调薪"),opt("bonus","奖金 / 提成 / 股权归属"),opt("project","重要项目完成 / 上线 / 验收"),opt("contract","合同 / 服务期 / 身份 / 工作许可节点"),opt("certificate","证书 / 职称"),opt("org","明确的组织 / 岗位变化"),opt("vague","有一些可能，但目前不够明确"),opt("none","没有明确节点")];}},
-{id:"q24b",section:"补充判断",title:"你刚才选的节点，目前大概有多确定？",type:"single",showIf:function(a){return Array.isArray(a.q24)&&a.q24.some(function(x){return ["none","vague"].indexOf(x)<0;});},options:function(){return [opt("certain","基本确定"),opt("likely","很可能，但还有一些不确定"),opt("verbal","主要是口头预期"),opt("uncertain","很不确定")];}},
+{id:"q24",section:"补充判断",title:"如果只能选一个，你现在最值得等的节点是什么？",help:"只选最影响你“要不要再待一段时间”的那个节点。没有明确节点就直接选“没有明确节点”。",type:"single",options:function(){return [opt("promotion","晋升 / 调薪"),opt("bonus","奖金 / 提成 / 股权归属"),opt("project","重要项目完成 / 上线 / 验收"),opt("contract","合同 / 服务期 / 身份 / 工作许可节点"),opt("certificate","证书 / 职称"),opt("org","明确的组织 / 岗位变化"),opt("vague","有一些可能，但目前还不够明确"),opt("none","没有明确节点")];}},
+{id:"q24b",section:"补充判断",title:"这个节点目前大概有多确定？",type:"single",showIf:function(a){return typeof a.q24==="string"&&["none","vague"].indexOf(a.q24)<0;},options:function(){return [opt("certain","基本确定"),opt("likely","很可能，但还有一些不确定"),opt("verbal","主要是口头预期"),opt("uncertain","很不确定")];}},
+{id:"q24c",section:"补充判断",title:"你最想等的这个节点，距离现在大约还有多久？",type:"single",showIf:function(a){return typeof a.q24==="string"&&["none","vague"].indexOf(a.q24)<0;},options:function(){return [opt("lt3","3个月内"),opt("3to6","3–6个月"),opt("6to9","6–9个月"),opt("9to12","9–12个月"),opt("12plus","一年以上")];}},
 {id:"q25",section:"补充判断",title:"最近6个月，公司、岗位或收入来源有没有出现这些变化？",help:"可多选。它们不会直接平均进四维分数，但可能改变结果页最先提醒你的事情。",type:"multi",exclusive:["none","unknown"],options:q25Options},
 {id:"q25b",section:"补充判断",title:"你刚才选的这些风险，目前有多确定？",type:"single",showIf:function(a){return Array.isArray(a.q25)&&a.q25.some(function(x){return ["none","unknown"].indexOf(x)<0;});},options:function(){return [opt("fact","已经明确发生 / 有事实依据"),opt("sign","有明显迹象，但尚未完全确认"),opt("rumor","主要来自传闻或担心"),opt("unknown","不确定")];}}
 ];
