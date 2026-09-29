@@ -39,7 +39,7 @@ jobs:
       - name: Run desktop and mobile flows
         shell: bash
         run: |
-          cat > /tmp/work-worth-e2e.mjs <<'EOF'
+          cat > .work-worth-e2e.mjs <<'EOF'
           import { chromium } from 'playwright';
           import assert from 'node:assert/strict';
 
@@ -106,4 +106,4 @@ jobs:
           await browser.close();
           console.log('ok: desktop + mobile + resume + edit downstream reset');
           EOF
-          node /tmp/work-worth-e2e.mjs
+          node .work-worth-e2e.mjs
