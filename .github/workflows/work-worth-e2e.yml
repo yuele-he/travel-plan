@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=6'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=7'; then
               ok=1
               break
             fi
@@ -152,10 +152,46 @@ jobs:
             await context.close();
           }
 
+          async function multiSelectScrollFlow(){
+            const context=await browser.newContext({viewport:{width:390,height:700}});
+            const page=await context.newPage();
+            await page.goto(URL,{waitUntil:'networkidle'});
+            await page.evaluate(()=>localStorage.clear());
+            await page.reload({waitUntil:'networkidle'});
+            await page.click('#startBtn');
+
+            for(let i=0;i<35;i++){
+              const title=(await page.locator('#questionCard .q-title').innerText()).trim();
+              if(title.includes('下面哪些现实条件会限制你换工作')) break;
+              await answerCurrent(page,0);
+            }
+
+            const title=(await page.locator('#questionCard .q-title').innerText()).trim();
+            assert.ok(title.includes('下面哪些现实条件会限制你换工作'),'reached q21 multi-select');
+
+            await page.locator('#questionCard .option').nth(0).click();
+            await page.waitForTimeout(120);
+            await page.locator('#questionCard .option').nth(1).click();
+            await page.waitForTimeout(120);
+
+            await page.evaluate(()=>window.scrollTo(0,Math.min(360,Math.max(0,document.documentElement.scrollHeight-window.innerHeight))));
+            await page.waitForTimeout(100);
+            const before=await page.evaluate(()=>window.scrollY);
+            assert.ok(before>40,'mobile page scrolled before deselect');
+
+            await page.locator('#questionCard .option').nth(1).click();
+            await page.waitForTimeout(180);
+            const after=await page.evaluate(()=>window.scrollY);
+            assert.ok(Math.abs(after-before)<=8,'deselecting multi option preserves scroll: '+before+' -> '+after);
+
+            await context.close();
+          }
+
           await completeFlow({width:1280,height:800},'desktop');
           await completeFlow({width:390,height:844},'mobile');
           await resumeAndEditFlow();
+          await multiSelectScrollFlow();
           await browser.close();
-          console.log('ok: mobile auto-advance + multi-select CTA + desktop/mobile + resume/edit reset');
+          console.log('ok: mobile auto-advance + multi-select CTA + scroll preserve + desktop/mobile + resume/edit reset');
           EOF
           node .work-worth-e2e.mjs
