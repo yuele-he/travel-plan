@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=9'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=10'; then
               ok=1
               break
             fi
@@ -115,6 +115,9 @@ jobs:
               const natural=await page.locator('#sharePreview').evaluate(img=>({w:img.naturalWidth,h:img.naturalHeight}));
               assert.equal(natural.w,900,'share image width');
               assert.equal(natural.h,1200,'share image height');
+              assert.equal(await page.locator('script[data-qrcode-lib]').count(),0,'share card loads no QR library');
+              const source=await page.evaluate(()=>generateShareCard.toString());
+              assert.ok(!source.includes('扫码')&&!source.includes('QRCode')&&!source.includes('SHARE_URL'),'share card has no QR or test CTA');
               await page.locator('#shareCloseBtn').click();
             }
             assert.ok(multiSeen>=2,label+' encountered multi-select questions');
