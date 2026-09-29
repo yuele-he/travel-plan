@@ -61,7 +61,14 @@ jobs:
                 const next=page.locator('#nextBtn');
                 await next.waitFor({state:'visible'});
                 assert.ok((await next.innerText()).includes('继续')||(await next.innerText()).includes('结果'),'multi-select CTA');
+                console.log('MULTI before click',before,'disabled=',await next.isDisabled(),'selected=',await page.locator('#questionCard .option.selected').count());
                 await next.click();
+                await page.waitForTimeout(250);
+                const afterNext=await page.locator('#result:not(.hidden)').count()
+                  ? 'RESULT'
+                  : (await page.locator('#progressLabel').innerText()).trim();
+                console.log('MULTI',before,'->',afterNext);
+                assert.notEqual(afterNext,before,'multi-select continue from '+before);
               }
             }else{
               await page.waitForTimeout(700);
