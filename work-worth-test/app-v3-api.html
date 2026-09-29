@@ -194,7 +194,7 @@ function choose(q,value){
    var qi=questions.findIndex(function(x){return x.id===q.id;});
    for(var i=qi+1;i<questions.length;i++)delete state.answers[questions[i].id];
  }
- renderQuestion();
+ renderQuestion(true);
  if(!changed)return;
  var exclusiveSelected=q.type==="multi"&&(q.exclusive||[]).indexOf(value)>=0&&Array.isArray(state.answers[q.id])&&state.answers[q.id].length===1&&state.answers[q.id][0]===value;
  if(q.type!=="multi"||exclusiveSelected){
@@ -207,8 +207,10 @@ function choose(q,value){
    },320);
  }
 }
-function renderQuestion(){
- show(quiz);
+function renderQuestion(preserveScroll){
+ var keepY=preserveScroll?window.scrollY:null;
+ if(quiz.classList.contains("hidden"))show(quiz);
+ else if(!preserveScroll)window.scrollTo(0,0);
  var q=getQ(state.currentId);if(!q){finish();return;}
  var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});
  if(idx<0){state.currentId=visible[0].id;q=getQ(state.currentId);idx=0;}
@@ -220,6 +222,7 @@ function renderQuestion(){
  optionsOf(q).forEach(function(o){var selected=multi?(Array.isArray(answer)&&answer.indexOf(o.value)>=0):answer===o.value;html+='<button class="option '+(multi?"checkbox ":"")+(selected?"selected":"")+'" data-value="'+escapeHtml(o.value)+'"><span class="option-dot">'+(selected?"✓":"")+'</span><span>'+escapeHtml(o.label)+'</span></button>';});
  html+="</div>";card.innerHTML=html;card.querySelectorAll(".option").forEach(function(btn){btn.addEventListener("click",function(){choose(q,btn.dataset.value);});});
  if(multi){quizActions.classList.remove("hidden");nextBtn.disabled=!hasAnswer(q);nextBtn.textContent=idx===visible.length-1?"查看结果":"选好了，继续";}else{quizActions.classList.add("hidden");nextBtn.disabled=false;}save();
+ if(preserveScroll&&keepY!==null)requestAnimationFrame(function(){window.scrollTo(0,keepY);});
 }
 function goNext(){cancelAutoAdvance();var q=getQ(state.currentId);if(!q||!hasAnswer(q))return;var visible=visibleQuestions(),idx=visible.findIndex(function(x){return x.id===q.id;});if(idx===visible.length-1){finish();return;}state.path.push(q.id);state.currentId=visible[idx+1].id;save();renderQuestion();}
 function goBack(){cancelAutoAdvance();if(!state.path.length)return;state.currentId=state.path.pop();save();renderQuestion();}
