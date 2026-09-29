@@ -21,7 +21,7 @@ jobs:
           ok=0
           for i in $(seq 1 40); do
             body=$(curl -fsSL "$URL" || true)
-            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=5'; then
+            if printf '%s' "$body" | grep -q 'app-v3-api.html?v=6'; then
               ok=1
               break
             fi
@@ -104,6 +104,16 @@ jobs:
             await page.locator('.score-card').first().waitFor({state:'visible',timeout:20000});
             assert.equal(await page.locator('.score-card').count(),4,label+' score cards');
             assert.ok((await page.locator('.stage-title').innerText()).trim().length>0,label+' stage title');
+            if(label==='mobile'){
+              await page.locator('#shareCardBtn').click();
+              await page.locator('#shareModal:not(.hidden)').waitFor({state:'visible',timeout:10000});
+              const src=await page.locator('#sharePreview').getAttribute('src');
+              assert.ok(src&&src.startsWith('blob:'),'share image generated');
+              const natural=await page.locator('#sharePreview').evaluate(img=>({w:img.naturalWidth,h:img.naturalHeight}));
+              assert.equal(natural.w,900,'share image width');
+              assert.equal(natural.h,1200,'share image height');
+              await page.locator('#shareCloseBtn').click();
+            }
             assert.ok(multiSeen>=3,label+' encountered multi-select questions');
             const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
             assert.ok(overflow<=2,label+' horizontal overflow '+overflow);
